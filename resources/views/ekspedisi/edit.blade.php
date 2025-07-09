@@ -1,0 +1,27 @@
+<x-layout>
+    <x-slot:title>{{ $title }}</x-slot:title>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Edit Ekspedisi: {{ $ekspedisi->name }}</div>
+                    <div class="card-body">
+                        <form action="{{ route('ekspedisi.update', $ekspedisi->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nama Ekspedisi</label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $ekspedisi->name) }}" required>
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <a href="{{ route('ekspedisi.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-layout>

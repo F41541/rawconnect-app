@@ -1,0 +1,234 @@
+/* ===========================
+   GLOBAL & RESET STYLING
+   =========================== */
+
+/*Aturan scrollbar untuk html, body, dan sidebar digabung di sini agar terpusat dan tidak duplikat. */
+html, body, .sidebar {
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar {
+    display: none; /* Untuk browser WebKit (Chrome, Safari) */
+}
+
+/*Aturan padding utama dipindahkan ke sini agar lebih terorganisir */
+body {
+     margin: 0;
+     padding-top: 60px; /* Jarak untuk header yang fixed */
+     padding-left: 300px; /* Jarak untuk sidebar yang fixed */
+     background-color: #f8ffe5;
+     transition: padding-left 0.3s ease;
+}
+
+/* ===========================
+    ICON STYLING
+    =========================== */
+.bi {
+     font-size: 20px;
+}
+
+/* ===========================
+    SIDEBAR & NAVIGASI
+    =========================== */
+/*Semua aturan untuk .sidebar sekarang ada di satu blok */
+.sidebar {
+     position: fixed;
+     top: 0;
+     left: 0;
+     height: 100vh;
+     width: 300px;
+     background-color: #f8ffe5;
+     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+     z-index: 1031;
+     padding-top: 0px;
+     transition: transform 0.3s ease-in-out;
+     transform: translateX(0);
+     overflow-y: auto; /* Ini tetap diperlukan agar fungsionalitas scroll bekerja */
+}
+
+.sidebar .nav-link,
+.sidebar .nav-item button {
+     color: black !important; /* Warna teks hitam, !important diperlukan untuk menimpa Bootstrap */
+     transition: background-color 0.2s ease;
+     padding: 8px 12px;
+     margin: 2px 10px;
+     border-radius: 8px;
+}
+
+/*Aturan hover untuk link dan button digabung agar efisien */
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active,
+.sidebar .nav-item button:hover {
+     background-color: #06d6a0;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .nav-item button {
+     width: calc(100% - 20px);
+     background: none;
+     border: none;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+}
+
+.sidebar .collapse {
+     overflow: hidden;
+     transition: height 0.3s ease-in-out;
+}
+
+/* ===========================
+    HEADER STYLING
+    =========================== */
+.app-header {
+     background-color: #06d6a0;
+     color: #f8ffe5;
+     height: 60px;
+     position: fixed;
+     top: 0;
+     left: 300px;
+     width: calc(100% - 300px);
+     z-index: 1029;
+     display: flex;
+     align-items: center;
+     padding-left: 1rem;
+     transition: left 0.3s ease, width 0.3s ease;
+}
+
+.card-header-custom {
+    background-color: #eeeeee; /* Contoh: Warna Biru Langit Sangat Pucat */
+    color: #555 ; /* Contoh: Warna Teks Biru Gelap */
+}
+
+.list-group-item-header {
+    background-color: #f5f5f5; /* Background putih bersih */
+    font-weight: 600; /* Sedikit lebih tebal */
+    color: #555;
+}
+
+/* ===========================
+    LAYOUT & RESPONSIVE
+    =========================== */
+.overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: rgba(0, 0, 0, 0.3);
+     z-index: 1030;
+     display: none;
+}
+
+.overlay.show {
+     display: block;
+}
+
+.rotate-icon {
+     transition: transform 0.3s ease;
+}
+
+/*Selector ini lebih spesifik untuk memastikan ikon berputar */
+.sidebar .nav-item button[aria-expanded="true"] .rotate-icon {
+     transform: rotate(180deg);
+}
+
+/* Style khusus untuk judul pemisah di sidebar */
+.sidebar-heading {
+    /* Aturan styling teks (tidak berubah) */
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    
+    /* PERUBAHAN DI SINI */
+    /* Atur margin atas untuk jarak dari menu sebelumnya */
+    margin: 0.2rem 10px 0 10px; 
+
+    /* Garis pemisah di atas */
+    border-top: 1px solid #eee;
+    
+    /* Padding atas juga dikecilkan agar teks lebih dekat ke garis */
+    padding: 0.5rem 12px 0.25rem 12px;
+}
+
+/* Aturan untuk layar kecil (mobile) */
+@media (max-width: 768px) {
+     .sidebar {
+          transform: translateX(-100%);
+     }
+
+     .sidebar.show {
+          transform: translateX(0);
+     }
+
+     .app-header,
+     body.sidebar-hidden .app-header {
+          left: 0;
+          width: 100%;
+     }
+
+     body,
+     body.sidebar-hidden {
+          padding-left: 0;
+     }
+
+     /* Kita targetkan tombol tab di dalam #pengirimanTab agar spesifik */
+     #pengirimanTab .nav-link {
+     font-size: 0.85rem;      /* Kecilkan ukuran font sedikit */
+     padding: 0.6rem 0.75rem; /* Kurangi padding atas/bawah dan kanan/kiri */
+     }
+
+     /* Kecilkan juga badge angka di dalamnya */
+     #pengirimanTab .nav-link .badge {
+     font-size: 0.7rem;        /* Kecilkan ukuran font badge */
+     padding: 0.25em 0.5em;    /* Sesuaikan padding badge */
+     }
+
+}
+
+/* ===========================
+    KOMPONEN LAIN
+    =========================== */
+
+/* Efek hover ringan untuk card link */
+a.card-link:hover {
+    background-color: rgba(0, 0, 0, 0.025);
+}
+
+/* Hilangkan spinner di input type number */
+input[type=number].no-spinner::-webkit-outer-spin-button,
+input[type=number].no-spinner::-webkit-inner-spin-button {
+     -webkit-appearance: none;
+     margin: 0;
+}
+
+input[type=number].no-spinner {
+     appearance: textfield; /* Firefox */
+}
+
+.status-proses {
+    border-color: #ffc107;
+    background-color: #fff3cd;
+}
+.status-selesai {
+    border-color: #198754;
+    background-color: #d1e7dd;
+}
+.status-dibatalkan {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+/* ===========================
+   ANIMASI IKON CHEVRON
+   =========================== */
+.collapse-icon {
+    display: inline-block;
+    transition: transform 0.35s ease;
+}
+.collapse-icon.rotated {
+    transform: rotate(180deg);
+}
