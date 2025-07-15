@@ -12,25 +12,24 @@ import Alpine from 'alpinejs';
 document.addEventListener('DOMContentLoaded', () => {
 
     const pageDataEl = document.getElementById('page-data');
-    if (!pageDataEl) return; // Jika tidak ada data, hentikan
 
-    // 1. Logika Notifikasi Toastr
-    const sessionStatus = pageDataEl.dataset.sessionStatus;
+    // Jika elemen jembatan data tidak ada, jangan lakukan apa-apa
+    if (!pageDataEl) return;
+
+    // --- Logika 1: Notifikasi (Hanya berjalan jika ada pesan sesi) ---
     const sessionMessage = pageDataEl.dataset.sessionMessage;
     if (sessionMessage) {
+        const sessionStatus = pageDataEl.dataset.sessionStatus;
         toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "4000",
+            "closeButton": true, "progressBar": true, "positionClass": "toast-top-right", "timeOut": "4000",
         };
         if (sessionStatus === 'success') toastr.success(sessionMessage);
         if (sessionStatus === 'error') toastr.error(sessionMessage);
     }
 
-    // 2. Logika Grafik Penjualan
+    // --- Logika 2: Grafik Penjualan (Hanya berjalan jika ada kanvas dan datanya) ---
     const salesChartCanvas = document.getElementById('salesChart');
-    if (salesChartCanvas) {
+    if (salesChartCanvas && pageDataEl.dataset.salesChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.salesChartLabels);
         const values = JSON.parse(pageDataEl.dataset.salesChartValues);
         new Chart(salesChartCanvas, {
@@ -39,73 +38,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Logika Grafik Stok Masuk vs Keluar
+    // --- Logika 3: Grafik Stok (Hanya berjalan jika ada kanvas dan datanya) ---
     const stockChartCanvas = document.getElementById('stockMovementChart');
-    if (stockChartCanvas) {
+    if (stockChartCanvas && pageDataEl.dataset.stockChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.stockChartLabels);
         const stockMasuk = JSON.parse(pageDataEl.dataset.stockChartMasuk);
         const stockKeluar = JSON.parse(pageDataEl.dataset.stockChartKeluar);
         new Chart(stockChartCanvas, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    { 
-                        label: 'Stok Masuk', 
-                        data: stockMasuk, 
-                        backgroundColor: 'rgba(25, 135, 84, 0.7)', 
-                        borderColor: 'rgba(13, 150, 0, 1)', 
-                        borderWidth: 1 
-                    },
-                    { 
-                        label: 'Stok Keluar', 
-                        data: stockKeluar, 
-                        backgroundColor: 'rgba(220, 53, 69, 0.7)', 
-                        borderColor: 'rgba(255, 0, 25, 1)', 
-                        borderWidth: 1 
-                    }
-                ]
-            },
-            options: { 
-                scales: { 
-                    x: { stacked: false }, 
-                    y: { beginAtZero: true, ticks: { precision: 0 } } 
-                }, 
-                responsive: true, 
-                maintainAspectRatio: false 
-            }
+            type: 'bar', data: { labels: labels, datasets: [ { label: 'Stok Masuk', data: stockMasuk, backgroundColor: 'rgba(25, 135, 84, 0.7)' }, { label: 'Stok Keluar', data: stockKeluar, backgroundColor: 'rgba(220, 53, 69, 0.7)' } ] },
+            options: { scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } }, responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // ===========================================
-    // == LOGIKA BARU UNTUK GRAFIK MERCHANT ==
-    // ===========================================
+    // --- Logika 4: Grafik Merchant (Hanya berjalan jika ada kanvas dan datanya) ---
     const merchantChartCanvas = document.getElementById('merchantPieChart');
-    if (merchantChartCanvas) {
+    if (merchantChartCanvas && pageDataEl.dataset.merchantChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.merchantChartLabels);
         const data = JSON.parse(pageDataEl.dataset.merchantChartData);
-
         new Chart(merchantChartCanvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Jumlah Paket',
-                    data: data,
-                    backgroundColor: [
-                        'rgba(13, 110, 253, 0.7)',  // Biru
-                        'rgba(25, 135, 84, 0.7)',   // Hijau
-                        'rgba(255, 193, 7, 0.7)',  // Kuning
-                        'rgba(220, 53, 69, 0.7)',   // Merah
-                        'rgba(108, 117, 125, 0.7)'  // Abu-abu
-                    ],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
+            type: 'doughnut', data: { labels: labels, datasets: [{ label: 'Jumlah Paket', data: data, backgroundColor: ['rgba(13, 110, 253, 0.7)', 'rgba(25, 135, 84, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(220, 53, 69, 0.7)', 'rgba(108, 117, 125, 0.7)'], hoverOffset: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 });

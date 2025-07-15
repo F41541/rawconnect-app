@@ -69,15 +69,7 @@ class UserController extends Controller
             'user' => $user,
         ]);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-
-    }
-
+    
     /**
      * Update the specified resource in storage.
      */

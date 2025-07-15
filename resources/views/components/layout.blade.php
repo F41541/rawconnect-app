@@ -30,17 +30,31 @@
     {{-- Menghapus semua <script src="..."> manual dari sini. --}}
     {{-- Semua library (jQuery, Bootstrap JS, Toastr JS, script.js) --}}
     {{-- sekarang di-bundle oleh Vite melalui resources/js/app.js --}}
+    {{-- Jembatan data HANYA untuk notifikasi --}}
+    <div id="page-data" 
+        {{-- Data untuk Notifikasi Toastr --}}
+        @if(session('success') || session('error'))
+        data-session-status="{{ session('success') ? 'success' : 'error' }}"
+        data-session-message="{{ session('success') ?? session('error') }}"
+        @endif
 
-    {{-- Skrip inline untuk menampilkan notifikasi dari session Laravel --}}
-    @if (session('success') || session('error'))
-        <script>
-            // Membuat variabel global yang bisa dibaca oleh app.js
-            window.sessionFlash = {
-                status: "{{ session('success') ? 'success' : 'error' }}",
-                message: "{{ session('success') ?? session('error') }}"
-            };
-        </script>
-    @endif
+        {{-- Data untuk Grafik (HANYA AKAN ADA JIKA DIKIRIM DARI CONTROLLER) --}}
+        @isset($data['chartLabels'])
+            data-sales-chart-labels='@json($data['chartLabels'])'
+            data-sales-chart-values='@json($data['chartData'])'
+        @endisset
+        @isset($data['stockChartLabels'])
+            data-stock-chart-labels='@json($data['stockChartLabels'])'
+            data-stock-chart-masuk='@json($data['stockMasukData'])'
+            data-stock-chart-keluar='@json($data['stockKeluarData'])'
+        @endisset
+        @isset($data['merchantLabels'])
+            data-merchant-chart-labels='@json($data['merchantLabels'])'
+            data-merchant-chart-data='@json($data['merchantData'])'
+        @endisset
+        
+        style="display: none;">
+    </div>
     
     {{-- Slot ini tetap ada untuk skrip tambahan yang spesifik per halaman --}}
     @stack('scripts')

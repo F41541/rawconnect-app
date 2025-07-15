@@ -9,6 +9,7 @@ use App\Models\Kategori;
 use App\Models\JenisProduk;
 use App\Models\Ekspedisi;
 use App\Models\Merchant;
+use App\Models\StockLog;
 
 
 class ResetMasterDataCommand extends Command
@@ -33,6 +34,7 @@ class ResetMasterDataCommand extends Command
         JenisProduk::truncate();
         Ekspedisi::truncate();
         Merchant::truncate();
+        StockLog::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $this->info('✓ Data infrastruktur berhasil direset.');
 

@@ -106,7 +106,7 @@
                 <div class="collapse {{ $isAdminActive ? 'show' : '' }}" id="adminMenu">
                     <ul class="list-unstyled mb-0 sidebar-submenu">
                         <li>
-                            <a class="nav-link {{ request()->routeIs('superadmin.user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">
+                            <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">
                                 <i class="bi bi-people-fill me-2"></i>Manajemen Pengguna
                             </a>
                         </li>
