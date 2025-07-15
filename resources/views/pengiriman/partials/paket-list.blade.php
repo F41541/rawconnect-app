@@ -1,8 +1,8 @@
 {{-- resources/views/pengiriman/partials/paket-list.blade.php --}}
 
 @forelse ($pakets as $paket)
-    <div class="card mb-1 shadow-sm">
-        {{-- Bagian Header Kartu --}}
+    <div class="card mb-3 shadow-sm">
+        {{-- Bagian Header Kartu (Sesuai kode Anda) --}}
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="fw-bold d-flex align-items-center gap-1">
                 <img src="{{ optional($paket->toko)->logo ? asset('uploads/logo_toko/' . $paket->toko->logo) : asset('images/no-image.png') }}" alt="Logo {{ optional($paket->toko)->name }}" title="{{ optional($paket->toko)->name }}" style="width: 30px; height: 30px; object-fit: contain;">
@@ -28,14 +28,13 @@
                         <strong class="text-dark-emphasis">{{ $jenisNama }}</strong>
                     </li>
 
-                    <div class="justify-content-center align-item-center">
-                        @php
-                            $firstItemInGroup = $itemsInGroup->first();
-                            $restOfItemsInGroup = $itemsInGroup->slice(1);
-                            $collapseId = 'paket-' . $paket->id. '-jenis-' . Str::slug($jenisNama);
-                        @endphp
-                        </div>
+                    @php
+                        $firstItemInGroup = $itemsInGroup->first();
+                        $restOfItemsInGroup = $itemsInGroup->slice(1);
+                        $collapseId = 'paket-' . $paket->id. '-jenis-' . Str::slug($jenisNama);
+                    @endphp
 
+                    {{-- Tampilkan item pertama --}}
                     @if($firstItemInGroup)
                         <li class="list-group-item d-flex justify-content-between align-items-center ps-4">
                             <div>
@@ -48,23 +47,29 @@
                         </li>
                     @endif
                     
+                    {{-- Hanya jika ada item sisa, tampilkan sisanya dan tombol --}}
                     @if($restOfItemsInGroup->isNotEmpty())
-                        <div class="collapse" id="{{ $collapseId }}">
-                            @foreach($restOfItemsInGroup as $item)
-                                <li class="list-group-item d-flex justify-content-between align-items-center ps-4">
-                                    <div>
-                                        <span>{{ optional($item->produk)->nama ?? 'Produk Telah Dihapus' }}</span>
-                                        @if($item->deskripsi_varian)
-                                            <small class="text-primary fw-bold d-block">{{ $item->deskripsi_varian }}</small>
-                                        @endif
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">x {{ $item->jumlah }}</span>
-                                </li>
-                            @endforeach
-                        </div>
+                        {{-- PERBAIKAN TATA LETAK: Bungkus sisa item dalam <li> yang berisi <div> collapse --}}
+                        <li class="list-group-item p-0 border-0">
+                            <div class="collapse" id="{{ $collapseId }}">
+                                <ul class="list-group list-group-flush">
+                                    @foreach($restOfItemsInGroup as $item)
+                                        <li class="list-group-item d-flex justify-content-between align-items-center ps-4">
+                                            <div>
+                                                <span>{{ optional($item->produk)->nama ?? 'Produk Telah Dihapus' }}</span>
+                                                @if($item->deskripsi_varian)
+                                                    <small class="text-primary fw-bold d-block">{{ $item->deskripsi_varian }}</small>
+                                                @endif
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">x {{ $item->jumlah }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </li>
                         
+                        {{-- PERBAIKAN TATA LETAK: Tombol diletakkan di <li> terpisah di paling bawah --}}
                         <li class="list-group-item ps-4 py-2">
-                             {{-- PERUBAHAN: Tag <i> untuk ikon chevron dihapus dari sini --}}
                             <a class="btn btn-sm btn-link text-decoration-none p-0 collapse-trigger" data-bs-toggle="collapse" href="#{{ $collapseId }}" role="button" aria-expanded="false">
                                 <span class="collapse-text">Lihat {{ $restOfItemsInGroup->count() }} item lainnya</span>
                             </a>
@@ -74,7 +79,7 @@
             </ul>
         </div>
         
-        {{-- Bagian Footer Kartu (Tidak Berubah) --}}
+        {{-- Bagian Footer Kartu --}}
         <div class="card-footer text-muted d-flex justify-content-between align-items-center">
              <small>
                 {{ $paket->created_at->format('H:i') }} | {{ optional($paket->user)->name ?? 'N/A' }}
@@ -85,10 +90,12 @@
                     @method('PATCH')
                     <select name="status" class="form-select form-select-sm {{ $paket->status == 'proses' ? 'status-proses' : ($paket->status == 'selesai' ? 'status-selesai' : 'status-dibatalkan') }}" onchange="this.form.submit()" style="width: 130px;">
                         <option value="proses" {{ $paket->status == 'proses' ? 'selected' : '' }}>Proses</option>
-                        @can('is-admin-or-super-admin')
+                        <option value="selesai" {{ $paket->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        
+                        {{-- PERBAIKAN HAK AKSES: Menggunakan Gate 'batalkan-pengiriman' yang lebih spesifik --}}
+                        @can('cancel-shipments')
                             <option value="dibatalkan" {{ $paket->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                         @endcan
-                        <option value="selesai" {{ $paket->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
                     </select>
                 </form>
             </div>

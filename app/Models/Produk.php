@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Toko;
 use App\Models\JenisProduk;
+use App\Traits\HasStockLog; 
 
 class Produk extends Model
 {
-    use HasFactory;
+    use HasFactory, HasStockLog;
     
     protected $fillable = [
         'nama',

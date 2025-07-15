@@ -34,6 +34,11 @@
                                 @enderror
                             </div>
 
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <input id="role" name="role" type="text" class="form-control" value="{{ $user->role }}" disabled>
+                            </div>
+
                             <div class="d-flex align-items-center gap-4">
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                                 @if (session('status') === 'profile-updated')

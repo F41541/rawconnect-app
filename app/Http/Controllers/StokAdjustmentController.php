@@ -92,50 +92,44 @@ class StokAdjustmentController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi semua input dari form
+        // 1. Validasi input (tambahkan 'keterangan')
         $validatedData = $request->validate([
             'produk_id'   => 'required|exists:produks,id',
-            'jumlah'      => 'required|integer|min:1', // Jumlah harus angka positif
-            'action_type' => 'required|in:tambah,kurangi', // Aksi harus 'tambah' atau 'kurangi'
+            'jumlah'      => 'required|integer|min:1',
+            'tipe'        => 'required|in:masuk,keluar',
+            'keterangan'  => 'nullable|string|max:255',
         ]);
 
-        // 2. Gunakan Database Transaction untuk keamanan data
-        // Ini memastikan jika ada error, semua perubahan akan dibatalkan.
         DB::beginTransaction();
-
         try {
-            // Cari produk yang akan diupdate, dan kunci barisnya untuk mencegah race condition
             $produk = Produk::lockForUpdate()->findOrFail($validatedData['produk_id']);
-            $jumlah = $validatedData['jumlah'];
+            $jumlah = (int)$validatedData['jumlah'];
+            $keterangan = $validatedData['keterangan'];
 
-            // 3. Lakukan aksi berdasarkan tombol yang diklik
-            if ($validatedData['action_type'] === 'tambah') {
-                // Jika tombol 'Tambah' diklik, tambahkan stok
-                $produk->stok += $jumlah;
-            } else {
-                // Jika tombol 'Kurangi' diklik, kurangi stok
-                // Tambahkan pengaman agar stok tidak menjadi minus
+            // 2. Lakukan aksi berdasarkan tombol yang diklik
+            if ($validatedData['tipe'] === 'masuk') {
+                // Catat log DULU, baru ubah stok
+                $produk->recordStockChange($jumlah, 'penyesuaian', $keterangan);
+                $produk->increment('stok', $jumlah);
+
+            } else { // Jika 'keluar'
                 if ($produk->stok < $jumlah) {
-                    // Jika stok tidak cukup, batalkan transaksi dan kirim error
                     DB::rollBack();
-                    return redirect()->back()->withInput()->with('error', 'Gagal mengurangi! Stok saat ini ('. $produk->stok .') lebih kecil dari jumlah yang ingin dikurangi ('. $jumlah .').');
+                    return redirect()->back()->withInput()->with('error', 'Gagal! Stok saat ini ('. $produk->stok .') lebih kecil dari jumlah yang ingin dikurangi ('. $jumlah .').');
                 }
-                $produk->stok -= $jumlah;
+                // Catat log DULU (dengan angka negatif), baru ubah stok
+                $produk->recordStockChange(-$jumlah, 'penyesuaian', $keterangan);
+                $produk->decrement('stok', $jumlah);
             }
 
-            // 4. Simpan perubahan stok ke database
-            $produk->save();
-
-            // Jika semua berhasil, konfirmasi transaksi
+            // Method increment/decrement sudah otomatis save, jadi $produk->save() tidak perlu lagi
             DB::commit();
 
         } catch (\Exception $e) {
-            // Jika ada error lain yang tak terduga, batalkan transaksi
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan. Stok gagal diupdate.');
         }
 
-        // 5. Redirect kembali dengan pesan sukses
-        return redirect()->route('stok-adj.index')->with('success', 'Stok untuk produk "'. $produk->nama .'" berhasil diupdate!')->withInput();
+        return redirect()->route('stok-adj.index')->with('success', 'Stok berhasil diupdate!')->withInput();
     }
 }

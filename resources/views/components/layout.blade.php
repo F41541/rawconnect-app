@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Raw Connect</title>
+    
+    {{-- Menghapus semua link CSS manual. --}}
+    {{-- Vite sekarang menjadi satu-satunya yang bertanggung jawab untuk memuat SEMUA CSS dan JS. --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
-    <link rel="stylesheet" href="{{ asset('css/style.css') . '?v=' .time() }}" />
-    
+    {{-- Slot ini tetap ada untuk style tambahan yang spesifik per halaman --}}
     @stack('styles')
 
 </head>
-<body>
+<body class="bg-light">
     {{-- Komponen Sidebar dan Header --}}
     <x-sidebar />
     <x-header>
@@ -25,33 +23,26 @@
     </x-header>
 
     {{-- Konten Utama Halaman --}}
-    <div class="container py-0">
+    <div class="container py-4">
         {{ $slot }}
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    {{-- Menghapus semua <script src="..."> manual dari sini. --}}
+    {{-- Semua library (jQuery, Bootstrap JS, Toastr JS, script.js) --}}
+    {{-- sekarang di-bundle oleh Vite melalui resources/js/app.js --}}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <script src="{{ asset('js/script.js') . '?v=' .time() }}"></script>
-
-    <script>
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "4000",
-        };
-        @if(session('success'))
-            toastr.success("{{ session('success') }}");
-        @endif
-        @if(session('error'))
-            toastr.error("{{ session('error') }}");
-        @endif
-    </script>
+    {{-- Skrip inline untuk menampilkan notifikasi dari session Laravel --}}
+    @if (session('success') || session('error'))
+        <script>
+            // Membuat variabel global yang bisa dibaca oleh app.js
+            window.sessionFlash = {
+                status: "{{ session('success') ? 'success' : 'error' }}",
+                message: "{{ session('success') ?? session('error') }}"
+            };
+        </script>
+    @endif
     
+    {{-- Slot ini tetap ada untuk skrip tambahan yang spesifik per halaman --}}
     @stack('scripts')
 
 </body>

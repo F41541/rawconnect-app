@@ -1,5 +1,16 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
+
+    <div class="container py-4">
+        {{-- Tombol Tambah (FAB) dengan Gate yang benar --}}
+        @can('create-shipments')
+            <a href="{{ route('pengiriman.create') }}" 
+               class="btn btn-primary position-fixed" 
+               style="bottom: 32px; right: 32px; z-index: 1029; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                <i class="bi bi-plus-circle" style="font-size: 1.8rem;"></i>
+            </a>
+        @endcan
+
         <div class="nav-wrapper" style="overflow-x: auto;">
             <ul class="nav nav-tabs nav-fill" id="pengirimanTab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -20,18 +31,7 @@
             </ul>
         </div>
 
-        @can ('is-admin-or-super-admin')
-        <a href="{{ route('pengiriman.create') }}" 
-           class="btn btn-primary position-fixed" 
-           style="bottom: 32px; right: 32px; z-index: 1029; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-            <i class="bi bi-plus-circle" style="font-size: 1.8rem;"></i>
-        </a>
-        @endcan
-
-        <!-- Navigasi Tab -->
-
-        <!-- Konten Tab -->
-        <div class="tab-content" id="pengirimanTabContent">
+        <div class="tab-content mt-3" id="pengirimanTabContent">
             {{-- TAB UNTUK STATUS 'PROSES' --}}
             <div class="tab-pane fade show active" id="proses" role="tabpanel">
                 @include('pengiriman.partials.paket-list', ['pakets' => $paket_proses])
@@ -47,53 +47,49 @@
                 @include('pengiriman.partials.paket-list', ['pakets' => $paket_dibatalkan])
             </div>
         </div>
-
+    </div>
 
     @push('scripts')
     <script>
-        // Jalankan skrip setelah semua halaman dimuat
         document.addEventListener('DOMContentLoaded', function () {
             
-            // 1. Ambil parameter dari URL
+            // Skrip untuk auto-open tab dari URL (sudah benar)
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // 2. Cari parameter yang bernama 'status'
             const status = urlParams.get('status');
-
-            // 3. Jika parameter 'status' ada di URL (misal: 'selesai' atau 'dibatalkan')
             if (status) {
-                
-                // 4. Cari tombol tab yang sesuai. Contoh: jika status='selesai', cari tombol dengan id 'selesai-tab'
                 const tabToActivate = document.querySelector('#' + status + '-tab');
-
-                // 5. Jika tombolnya ditemukan, picu klik pada tombol tersebut
                 if (tabToActivate) {
-                    tabToActivate.click();
+                    // Gunakan Bootstrap 5's Tab constructor untuk mengaktifkan tab
+                    const tab = new bootstrap.Tab(tabToActivate);
+                    tab.show();
                 }
             }
+
+            // PERBAIKAN: Skrip untuk mengubah teks & ikon tombol 'Lihat Detail'
+            const collapseTriggers = document.querySelectorAll('.collapse-trigger');
+            collapseTriggers.forEach(trigger => {
+                const targetId = trigger.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                const textElement = trigger.querySelector('.collapse-text');
+                const iconElement = trigger.querySelector('.collapse-icon'); // Tambahkan pencarian ikon
+
+                if (targetElement && textElement && iconElement) {
+                    const originalText = textElement.textContent.trim();
+
+                    // Saat collapse mulai DITAMPILKAN
+                    targetElement.addEventListener('show.bs.collapse', event => {
+                        textElement.textContent = 'Lihat lebih sedikit';
+                        iconElement.classList.add('rotated'); // Tambahkan kelas untuk memutar
+                    });
+
+                    // Saat collapse mulai DI SEMBUNYIKAN
+                    targetElement.addEventListener('hide.bs.collapse', event => {
+                        textElement.textContent = originalText;
+                        iconElement.classList.remove('rotated'); // Hapus kelas untuk mengembalikan
+                    });
+                }
+            });
         });
-            // Skrip baru untuk mengubah teks & ikon tombol 'Lihat Detail'
-    const collapseTriggers = document.querySelectorAll('.collapse-trigger');
-    
-    collapseTriggers.forEach(trigger => {
-        const targetId = trigger.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        const textElement = trigger.querySelector('.collapse-text');
-
-        if (targetElement && textElement) {
-            const originalText = textElement.textContent.trim();
-
-            // Saat collapse mulai DITAMPILKAN
-            targetElement.addEventListener('show.bs.collapse', event => {
-                textElement.textContent = 'Lihat lebih sedikit';
-            });
-
-            // Saat collapse mulai DI SEMBUNYIKAN
-            targetElement.addEventListener('hide.bs.collapse', event => {
-                textElement.textContent = originalText;
-            });
-        }
-    });
     </script>
     @endpush
 </x-layout>

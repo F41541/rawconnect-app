@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'superadmin@rawconnect.test'], // Kunci untuk mencari
             values: [ // Data yang akan dibuat jika tidak ditemukan
-            'name' => 'Super Admin',
+            'name' => 'Feygi Setiawan',
             'password' => Hash::make('password'),
             'role' => 'super-admin',
             ]

@@ -15,6 +15,9 @@ use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use App\Models\ItemPaket;
+use App\Models\StockLog;
 
 class PaketPengirimanController extends Controller
 {
@@ -23,24 +26,113 @@ class PaketPengirimanController extends Controller
      */
     public function index()
     {
-        $semuaPaket = PaketPengiriman::with(['toko', 'merchant', 'ekspedisi', 'user', 'items.produk.jenisProduk'])->latest()->get();
-        $paketByStatus = $semuaPaket->groupBy('status');
+        // Fungsi with() akan me-load relasi untuk mencegah query N+1
+        $relations = ['toko', 'merchant', 'ekspedisi', 'user', 'items.produk.jenisProduk'];
+
+        // Ambil data untuk setiap status secara terpisah dan paginasi
+        $paket_proses = PaketPengiriman::where('status', 'proses')
+                                       ->with($relations)
+                                       ->latest()
+                                       ->paginate(10, ['*'], 'prosesPage');
+
+        $paket_selesai = PaketPengiriman::where('status', 'selesai')
+                                      ->with($relations)
+                                      ->latest()
+                                      ->paginate(10, ['*'], 'selesaiPage');
+
+        $paket_dibatalkan = PaketPengiriman::where('status', 'dibatalkan')
+                                         ->with($relations)
+                                         ->latest()
+                                         ->paginate(10, ['*'], 'dibatalkanPage');
+
         return view('pengiriman.index', [
             'title' => 'Daftar Pengiriman',
-            'paket_proses' => $paketByStatus->get('proses', collect()),
-            'paket_selesai' => $paketByStatus->get('selesai', collect()),
-            'paket_dibatalkan' => $paketByStatus->get('dibatalkan', collect()),
+            'paket_proses' => $paket_proses,
+            'paket_selesai' => $paket_selesai,
+            'paket_dibatalkan' => $paket_dibatalkan,
         ]);
     }
 
     public function dashboard()
     {
+        $user = auth()->user();
+        $data = [];
+
+        // Menghitung jumlah TOTAL untuk setiap status
+        $data['jumlah_proses'] = PaketPengiriman::where('status', 'proses')->count();
+        $data['jumlah_selesai'] = PaketPengiriman::where('status', 'selesai')->count();
+        $data['jumlah_dibatalkan'] = PaketPengiriman::where('status', 'dibatalkan')->count();
+
+        // Data untuk Pegawai & Admin
+        if ($user->can('adjust-stock')) {
+            $lowStockThreshold = 10;
+            $data['produk_stok_rendah'] = Produk::where('stok', '<=', $lowStockThreshold)
+                                            ->where('stok', '>', 0)
+                                            ->orderBy('stok', 'asc')
+                                            ->limit(5)
+                                            ->get();
+        }
+
+        // Data untuk Super Admin
+        if ($user->can('is-super-admin')) {
+            // PERBAIKAN: Definisikan variabel $today di sini sebelum digunakan
+            $today = now()->toDateString();
+
+            $data['penjualan_hari_ini'] = ItemPaket::whereHas('paketPengiriman', function($q) use ($today) {
+                $q->where('status', 'selesai')->whereDate('created_at', $today);
+            })->sum('jumlah');
+            
+            $data['penjualan_bulan_ini'] = ItemPaket::whereHas('paketPengiriman', function($q) {
+                $q->where('status', 'selesai')->whereMonth('created_at', now()->month);
+            })->sum('jumlah');
+        }
+
+        // Logika Grafik Penjualan 7 Hari Terakhir
+        $sevenDaysAgo = now()->subDays(6)->startOfDay();
+
+        // Ambil data stok masuk (jumlah_berubah > 0)
+        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)
+            ->where('created_at', '>=', $sevenDaysAgo)
+            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+            
+        // Ambil data stok keluar (jumlah_berubah < 0)
+        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)
+            ->where('created_at', '>=', $sevenDaysAgo)
+            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+
+        // Siapkan array untuk 7 hari terakhir
+        $dateRange = collect(range(0, 6))->map(fn($day) => now()->subDays(6 - $day));
+
+        // Proses data untuk grafik
+        $data['stockChartLabels'] = $dateRange->map(fn($date) => $date->format('d M'))->toArray();
+
+        $data['stockMasukData'] = $dateRange->map(function ($date) use ($stokMasukData) {
+            $formattedDate = $date->format('Y-m-d');
+            return $stokMasukData->get($formattedDate)->total ?? 0;
+        })->toArray();
+
+        $data['stockKeluarData'] = $dateRange->map(function ($date) use ($stokKeluarData) {
+            $formattedDate = $date->format('Y-m-d');
+            // Ambil nilai absolut karena stok keluar adalah negatif
+            return abs($stokKeluarData->get($formattedDate)->total ?? 0);
+        })->toArray();
+
+        $salesByMerchant = PaketPengiriman::where('status', 'selesai')
+            ->join('merchants', 'paket_pengiriman.merchant_id', '=', 'merchants.id')
+            ->select('merchants.name as nama_merchant', DB::raw('count(*) as total'))
+            ->groupBy('merchants.name')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $data['merchantLabels'] = $salesByMerchant->pluck('nama_merchant');
+        $data['merchantData'] = $salesByMerchant->pluck('total');
+
+
         return view('dashboard', [
-            'jumlah_perlu'      => PaketPengiriman::where('status', 'proses')->count(),
-            'jumlah_selesai'    => PaketPengiriman::where('status', 'selesai')->count(),
-            'jumlah_dibatalkan' => PaketPengiriman::where('status', 'dibatalkan')->count(),
-            'jumlah_keranjang'  => PratinjauItem::count(),
-            'title'             => 'DASHBOARD',
+            'title' => 'DASHBOARD',
+            'data'  => $data
         ]);
     }
 
@@ -290,12 +382,14 @@ class PaketPengirimanController extends Controller
                     if(optional($item->produk)->stok < $jumlahPengurang) {
                         throw new \Exception('Stok untuk produk "'. optional($item->produk)->nama .'" tidak mencukupi saat akan diselesaikan.');
                     }
+                    $item->produk->recordStockChange(-$jumlahPengurang, 'penjualan', 'Paket ID: ' . $paketPengiriman->id);
                     $item->produk()->lockForUpdate()->decrement('stok', $jumlahPengurang);
                 }
             } 
             else if ($oldStatus === 'selesai' && $newStatus !== 'selesai') {
                 foreach ($paketPengiriman->items as $item) {
                     $jumlahPenambah = ($item->berat_per_item > 0) ? $item->berat_per_item * $item->jumlah : $item->jumlah;
+                    $item->produk->recordStockChange($jumlahPenambah, 'retur/batal', 'Paket ID: ' . $paketPengiriman->id);
                     $item->produk()->lockForUpdate()->increment('stok', $jumlahPenambah);
                 }
             }

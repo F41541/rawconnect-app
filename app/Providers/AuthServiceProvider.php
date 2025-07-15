@@ -2,41 +2,54 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use App\Models\User;
+use App\Models\PratinjauItem;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
+     * The model to policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
      */
-    public function register(): void
-    {
+    protected $policies = [
         //
-    }
+    ];
 
     /**
-     * Bootstrap services.
+     * Register any authentication / authorization services.
      */
-    public function boot(): void
-    {
-        // Daftarkan Gate baru kita untuk memeriksa peran pengguna
+public function boot(): void
+{
+    // Izin untuk mengelola data master & pengguna (Hanya Super Admin)
+    Gate::define('is-super-admin', function (User $user) {
+        return $user->role === 'super-admin';
+    });
+    
+    // Izin untuk membuat pengiriman & membatalkannya (Admin & Super Admin)
+    Gate::define('manage-shipments', function (User $user) {
+        return in_array($user->role, ['super-admin', 'admin']);
+    });
 
-        // Gate ini akan bernilai TRUE hanya jika peran pengguna adalah 'super-admin'
-        Gate::define('is-super-admin', function (User $user) {
-            return $user->role === 'super-admin';
-        });
+    Gate::define('cancel-shipments', function (User $user) {
+        return in_array($user->role, ['super-admin', 'admin']);
+    });
 
-        // Gate ini akan bernilai TRUE jika peran pengguna adalah 'admin' ATAU 'super-admin'
-        Gate::define('is-admin-or-super-admin', function (User $user) {
-            return in_array($user->role, ['super-admin', 'admin']);
-        });
+    // Izin untuk melakukan penyesuaian stok (Pegawai & Admin)
+    Gate::define('adjust-stock', function (User $user) {
+        return in_array($user->role, ['admin', 'pegawai']);
+    });
 
-        Gate::define('is-pegawai', function (User $user) {
-            return in_array($user->role, ['pegawai']);
-        });
+    // Izin untuk mengubah status (semua peran)
+    Gate::define('update-status', function (User $user) {
+        return in_array($user->role, ['super-admin', 'admin', 'pegawai']);
+    });
 
-        // Anda bisa menambahkan Gate lain di sini untuk peran 'pegawai' jika diperlukan nanti
-    }
+    // Izin untuk update item di pratinjau (hanya pemilik)
+    Gate::define('update-pratinjau-item', function (User $user, PratinjauItem $pratinjauItem) {
+        return $user->id === $pratinjauItem->user_id;
+    });
+}
 }

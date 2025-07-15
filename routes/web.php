@@ -13,62 +13,65 @@ use App\Http\Controllers\StokAdjustmentController;
 use App\Http\Controllers\LayananPengirimanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SuperAdmin\LaporanController;
+use App\Http\Controllers\SuperAdmin\MasterController;
+use App\Http\Controllers\LogController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
-// Memeriksa apakah user sudah login atau belum.
+// Rute Autentikasi dari Breeze
+require __DIR__.'/auth.php';
+
+// Rute Halaman Utama
 Route::get('/', function () {
-    // Jika sudah login, langsung lempar ke dashboard.
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-    // Jika belum, arahkan ke halaman login.
+    if (Auth::check()) { return redirect()->route('dashboard'); }
     return redirect()->route('login');
 });
 
-// --- SEMUA RUTE YANG MEMERLUKAN LOGIN DITARUH DI DALAM GRUP INI ---
+// === RUTE YANG MEMERLUKAN LOGIN ===
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // --- GRUP 1: Rute untuk SEMUA PERAN (Pegawai, Admin, Super Admin) ---
     Route::get('/dashboard', [PaketPengirimanController::class, 'dashboard'])->name('dashboard');
-
-    Route::middleware('can:is-super-admin')->group(function() {
-        Route::resource('user', UserController::class);
-    });
-
-    // --- PENGIRIMAN ---
-    Route::get('/pengiriman', [PaketPengirimanController::class, 'index'])->name('pengiriman.index');
-    Route::get('/pengiriman/create', [PaketPengirimanController::class, 'create'])->name('pengiriman.create');
-    Route::post('/pengiriman/tambah', [PaketPengirimanController::class, 'tambahKePratinjau'])->name('pengiriman.tambah');
-    Route::get('/pengiriman/pratinjau', [PaketPengirimanController::class, 'pratinjau'])->name('pengiriman.pratinjau');
-    Route::delete('/pengiriman/hapus/{pratinjauItem}', [PaketPengirimanController::class, 'hapusDariPratinjau'])->name('pengiriman.hapus');
-    Route::post('/pengiriman/proses', [PaketPengirimanController::class, 'prosesPratinjau'])->name('pengiriman.proses');
-    Route::patch('/pengiriman/paket/{paketPengiriman}/update-status', [PaketPengirimanController::class, 'updateStatusPaket'])->name('paket.updateStatus');
-    Route::patch('/pengiriman/pratinjau/update-jumlah/{pratinjauItem}', [PaketPengirimanController::class, 'updateJumlahPratinjau'])->name('pratinjau.updateJumlah');
-
-    // HALAMAN STOK DINAMIS
-    Route::get('/stok/jenis/{jenisProduk}', [ProdukController::class, 'showByJenis'])->name('stok.show_by_jenis');
-    Route::patch('/stok/koreksi/{produk}', [ProdukController::class, 'koreksiStok'])->name('stok.koreksi');
-    
-    // FITUR UPDATE STOK CEPAT
-    Route::get('/stok-adjustment', [StokAdjustmentController::class, 'index'])->name('stok-adj.index');
-    Route::post('/stok-adjustment', [StokAdjustmentController::class, 'store'])->name('stok-adj.store');
-
-    // MANAJEMEN DATA MASTER (RESOURCE CONTROLLERS)
-    Route::resource('toko', TokoController::class);
-    Route::resource('jenis-produk', JenisProdukController::class);
-    Route::resource('ekspedisi', EkspedisiController::class);
-    Route::resource('merchant', MerchantController::class);
-    Route::resource('kategori', KategoriController::class);
-    Route::resource('produk', ProdukController::class)->except(['show']);
-    Route::resource('layanan-pengiriman', LayananPengirimanController::class)->except(['show', 'edit', 'update']);
-    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Melihat daftar pengiriman dan stok bisa dilakukan semua peran
+    Route::get('/pengiriman', [PaketPengirimanController::class, 'index'])->name('pengiriman.index');
+    Route::get('/stok/jenis/{jenisProduk}', [ProdukController::class, 'showByJenis'])->name('stok.show_by_jenis');
+    // Mengubah status juga bisa dilakukan semua peran (namun opsi 'dibatalkan' akan di-handle di view & controller)
+    Route::patch('/pengiriman/paket/{paketPengiriman}/update-status', [PaketPengirimanController::class, 'updateStatusPaket'])->name('paket.updateStatus');
+    Route::get('/log/stok', [LogController::class, 'stokLog'])->name('log.stok');
+
+    // --- GRUP 2: Rute untuk PEGAWAI & ADMIN (sesuai Gate 'adjust-stock') ---
+    Route::middleware('can:adjust-stock')->group(function() {
+        Route::get('/stok-adjustment', [StokAdjustmentController::class, 'index'])->name('stok-adj.index');
+        Route::patch('/stok/koreksi/{produk}', [ProdukController::class, 'koreksiStok'])->name('stok.koreksi');
+        
+        Route::post('/stok-adjustment', [StokAdjustmentController::class, 'store'])->name('stok-adj.store');
+    });
+
+    // --- GRUP 3: Rute untuk ADMIN & SUPER ADMIN (sesuai Gate 'manage-shipments') ---
+    Route::middleware('can:manage-shipments')->group(function() {
+        Route::get('/pengiriman/create', [PaketPengirimanController::class, 'create'])->name('pengiriman.create');
+        Route::post('/pengiriman/tambah', [PaketPengirimanController::class, 'tambahKePratinjau'])->name('pengiriman.tambah');
+        Route::get('/pengiriman/pratinjau', [PaketPengirimanController::class, 'pratinjau'])->name('pengiriman.pratinjau');
+        Route::delete('/pengiriman/hapus/{pratinjauItem}', [PaketPengirimanController::class, 'hapusDariPratinjau'])->name('pengiriman.hapus');
+        Route::post('/pengiriman/proses', [PaketPengirimanController::class, 'prosesPratinjau'])->name('pengiriman.proses');
+        Route::patch('/pengiriman/pratinjau/update-jumlah/{pratinjauItem}', [PaketPengirimanController::class, 'updateJumlahPratinjau'])->name('pratinjau.updateJumlah');
+    });
+
+    // --- GRUP 4: RUTE HANYA UNTUK SUPER ADMIN ---
+    Route::middleware('can:is-super-admin')->prefix('superadmin')->group(function() {
+        Route::get('/master', [MasterController::class, 'index'])->name('master.index');
+        Route::get('/laporan', [LaporanController::class, 'penjualan'])->name('laporan.index');
+        Route::resource('user', UserController::class);
+        Route::resource('toko', TokoController::class);
+        Route::resource('jenis-produk', JenisProdukController::class);
+        Route::resource('ekspedisi', EkspedisiController::class);
+        Route::resource('merchant', MerchantController::class);
+        Route::resource('kategori', KategoriController::class);
+        Route::resource('produk', ProdukController::class)->except(['show']);
+        Route::resource('layanan-pengiriman', LayananPengirimanController::class)->except(['show', 'edit', 'update']);
+    });
 });
 
 
@@ -90,6 +93,3 @@ Route::prefix('api')->name('api.')->group(function () {
     });
 
 });
-
-// Rute Bawaan Breeze untuk proses login, logout, register, dll.
-require __DIR__.'/auth.php';

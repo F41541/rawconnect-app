@@ -164,7 +164,25 @@ class ProdukController extends Controller
     public function koreksiStok(Request $request, Produk $produk)
     {
         $validated = $request->validate(['stok' => 'required|integer|min:0']);
-        $produk->update(['stok' => $validated['stok']]);
+
+        // 1. Ambil nilai stok lama dan baru
+        $stokLama = $produk->stok;
+        $stokBaru = $validated['stok'];
+
+        // 2. Hitung selisih perubahannya
+        $perubahan = $stokBaru - $stokLama;
+
+        // Jika tidak ada perubahan, tidak perlu lakukan apa-apa
+        if ($perubahan == 0) {
+            return redirect()->back()->with('info', 'Tidak ada perubahan pada stok.');
+        }
+        
+        // 3. Catat perubahan ke log DULU
+        $produk->recordStockChange($perubahan, 'koreksi manual');
+        
+        // 4. BARU update stoknya
+        $produk->update(['stok' => $stokBaru]);
+
         return redirect()->back()->with('success', 'Stok untuk produk "'. $produk->nama .'" berhasil dikoreksi!');
     }
 }
