@@ -44,9 +44,9 @@
                     <td>{{ $produk->stok }}</td>
                     <td>
                         {{-- Tombol Aksi (sudah benar) --}}
-                        <a href="{{ route('produk.edit', $produk->id) }}" class="btn btn-sm btn-outline-primary" title="Edit Detail Produk"><i class="bi bi-pencil"></i></a>
+                        <a href="{{ route('superadmin.produk.edit', $produk->id) }}" class="btn btn-sm btn-outline-primary" title="Edit Detail Produk"><i class="bi bi-pencil"></i></a>
                         <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#koreksiStokModal" data-url="{{ route('stok.koreksi', $produk->id) }}" data-nama="{{ $produk->nama }}" data-stok="{{ $produk->stok }}" title="Koreksi Stok"><i class="bi bi-list-check"></i></button>
-                        <form action="{{ route('produk.destroy', $produk->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                        <form action="{{ route('superadmin.produk.destroy', $produk->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>

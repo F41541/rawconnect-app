@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header">Tambah Konfigurasi Layanan Baru</div>
                     <div class="card-body">
-                        <form action="{{ route('layanan-pengiriman.store') }}" method="POST">
+                        <form action="{{ route('superadmin.layanan-pengiriman.store') }}" method="POST">
                             @csrf
                             
                             {{-- Pilih Toko --}}
@@ -56,7 +56,7 @@
                             </div>
                             
                             <div class="d-flex justify-content-end mt-4">
-                                <a href="{{ route('layanan-pengiriman.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.layanan-pengiriman.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan Layanan</button>
                             </div>
                         </form>

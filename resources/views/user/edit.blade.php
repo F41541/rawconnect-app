@@ -7,7 +7,7 @@
                     <h5 class="card-title mb-0">Formulir Edit Pengguna</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('user.update', $user->id) }}" method="POST">
+                    <form action="{{ route('superadmin.user.update', $user->id) }}" method="POST">
                         @csrf
                         @method('PUT') {{-- Method wajib untuk update --}}
 
@@ -45,7 +45,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('user.index') }}" class="btn btn-secondary me-2">Batal</a>
+                            <a href="{{ route('superadmin.user.index') }}" class="btn btn-secondary me-2">Batal</a>
                             <button type="submit" class="btn btn-primary">Update Pengguna</button>
                         </div>
                     </form>

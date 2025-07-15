@@ -6,7 +6,7 @@
                 <div class="card">
                     <div class="card-header">Edit Kategori: {{ $kategori->name }}</div>
                     <div class="card-body">
-                        <form action="{{ route('kategori.update', $kategori->id) }}" method="POST">
+                        <form action="{{ route('superadmin.kategori.update', $kategori->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
@@ -16,7 +16,7 @@
                                 @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('kategori.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.kategori.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </form>

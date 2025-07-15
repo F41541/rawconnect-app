@@ -22,7 +22,7 @@
                     </select>
                 </form>
 
-                <a href="{{ route('produk.index') }}" class="btn btn-secondary">
+                <a href="{{ route('superadmin.produk.index') }}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
             </div>

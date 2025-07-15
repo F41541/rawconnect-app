@@ -2,14 +2,22 @@
         <x-slot:title>{{ $title }}</x-slot:title>
         <div class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{{ route('master.index') }}" class="btn btn-outline-secondary me-2" title="Kembali">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
                 <a href="{{ route('produk.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i>Tambah Produk
                 </a>
             </div>
 
             {{-- Loop terluar: untuk setiap KATEGORI --}}
-            @forelse ($kategoris as $kategori)
+            @php
+                $hasProduk = false;
+            @endphp
+
+            @foreach ($kategoris as $kategori)
                 @if($kategori->jenisProduks->isNotEmpty())
+                    @php $hasProduk = true; @endphp
                     <div class="mb-3">
                         <div class="accordion" id="accordionKategori{{ $kategori->id }}">
                             <div class="accordion-item">
@@ -41,12 +49,14 @@
                         </div>
                     </div>
                 @endif
-            @empty
+            @endforeach
+
+            @if(!$hasProduk)
                 <div class="col-12">
                     <div class="alert alert-warning text-center">
-                        Belum ada Kategori yang dibuat. Silakan tambahkan melalui <a href="{{ route('kategori.index') }}">Manajemen Kategori</a>.
+                        Belum ada Kategori yang dibuat atau semua kategori kosong. Silakan tambahkan terlebih dahulu <a href="{{ route('produk.create') }}">Tambah Produk</a>.
                     </div>
                 </div>
-            @endforelse    
+            @endif
         </div>
     </x-layout>

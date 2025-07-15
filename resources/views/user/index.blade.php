@@ -2,8 +2,7 @@
     <x-slot:title>{{ $title }}</x-slot:title>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Manajemen Pengguna</h2>
-            <a href="{{ route('user.create') }}" class="btn btn-primary">
+            <a href="{{ route('superadmin.user.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Tambah Pengguna
             </a>
         </div>
@@ -31,8 +30,8 @@
                                 </td>
                                 <td>{{ $user->created_at->format('d M Y') }}</td>
                                 <td>
-                                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
-                                        <form action="{{ route('user.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin menghapus pengguna ini secara permanen?')">
+                                    <a href="{{ route('superadmin.user.edit', $user->id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                        <form action="{{ route('superadmin.user.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin menghapus pengguna ini secara permanen?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>

@@ -6,7 +6,7 @@
                 <div class="card">
                     <div class="card-header">Edit Jenis Produk: {{ $jenisProduk->name }}</div>
                     <div class="card-body">
-                        <form action="{{ route('jenis-produk.update', $jenisProduk->id) }}" method="POST">
+                        <form action="{{ route('superadmin.jenis-produk.update', $jenisProduk->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
@@ -38,7 +38,7 @@
                             </div>
                             
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('jenis-produk.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.jenis-produk.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </form>

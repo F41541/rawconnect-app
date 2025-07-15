@@ -7,7 +7,7 @@
                     {{-- PENJELASAN (BUG #4): Mengganti judul dinamis menjadi statis --}}
                     <div class="card-header">Tambah Jenis Produk Baru</div>
                     <div class="card-body">
-                        <form action="{{ route('jenis-produk.store') }}" method="POST">
+                        <form action="{{ route('superadmin.jenis-produk.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama Jenis Produk</label>
@@ -32,7 +32,7 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('jenis-produk.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.jenis-produk.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>

@@ -2,8 +2,10 @@
     <x-slot:title>{{ $title }}</x-slot:title>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Manajemen Layanan Pengiriman</h2>
-            <a href="{{ route('layanan-pengiriman.create') }}" class="btn btn-primary">
+            <a href="{{ route('superadmin.master.index') }}" class="btn btn-outline-secondary me-2" title="Kembali">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <a href="{{ route('superadmin.layanan-pengiriman.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Tambah Layanan
             </a>
         </div>
@@ -25,7 +27,7 @@
                                     <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-1 bg-light">
                                         <span class="fw-bold" style="font-size: 0.85rem;">{{ $layanan->ekspedisi->name }}</span>
                                         {{-- Form hapus untuk setiap ekspedisi individu --}}
-                                        <form action="{{ route('layanan-pengiriman.destroy', $layanan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus layanan {{ $layanan->ekspedisi->name }} dari merchant ini?')">
+                                        <form action="{{ route('superadmin.layanan-pengiriman.destroy', $layanan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus layanan {{ $layanan->ekspedisi->name }} dari merchant ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-close" aria-label="Close" style="width: 0.5em; height: 0.5em;"></button>

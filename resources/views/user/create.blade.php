@@ -7,7 +7,7 @@
                     <h5 class="card-title mb-0">Formulir Tambah Pengguna Baru</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('user.store') }}" method="POST">
+                    <form action="{{ route('superadmin.user.store') }}" method="POST">
                         @csrf
                         {{-- Input Nama --}}
                         <div class="mb-3">
@@ -43,7 +43,7 @@
                         </div>
                         
                         <div class="d-flex justify-content-end">
-                            <a href="{{ route('user.index') }}" class="btn btn-secondary me-2">Batal</a>
+                            <a href="{{ route('superadmin.user.index') }}" class="btn btn-secondary me-2">Batal</a>
                             <button type="submit" class="btn btn-primary">Simpan Pengguna</button>
                         </div>
                     </form>

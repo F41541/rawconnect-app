@@ -4,8 +4,10 @@
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             {{-- PENJELASAN: Menambahkan judul utama halaman untuk konsistensi. --}}
-            <h2 class="mb-0">Manajemen Toko</h2>
-            <a href="{{ route('toko.create') }}" class="btn btn-primary">
+            <a href="{{ route('superadmin.master.index') }}" class="btn btn-outline-secondary me-2" title="Kembali">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <a href="{{ route('superadmin.toko.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Tambah Toko Baru
             </a>
         </div>
@@ -23,7 +25,7 @@
                                     $nextOrder = $isSortedByName && $sortOrder === 'asc' ? 'desc' : 'asc';
                                     $arrow = $isSortedByName ? ($sortOrder === 'asc' ? '↑' : '↓') : '↕';
                                 @endphp
-                                <a href="{{ route('toko.index', ['sort' => 'name', 'order' => $nextOrder]) }}" class="text-decoration-none text-dark">
+                                <a href="{{ route('superadmin.toko.index', ['sort' => 'name', 'order' => $nextOrder]) }}" class="text-decoration-none text-dark">
                                     Nama Toko <span>{{ $arrow }}</span>
                                 </a>
                             </th>
@@ -33,7 +35,7 @@
                                     $nextOrder = $isSortedByDate && $sortOrder === 'asc' ? 'desc' : 'asc';
                                     $arrow = $isSortedByDate ? ($sortOrder === 'asc' ? '↑' : '↓') : '↕';
                                 @endphp
-                                <a href="{{ route('toko.index', ['sort' => 'created_at', 'order' => $nextOrder]) }}" class="text-decoration-none text-dark">
+                                <a href="{{ route('superadmin.toko.index', ['sort' => 'created_at', 'order' => $nextOrder]) }}" class="text-decoration-none text-dark">
                                     Tanggal Dibuat <span>{{ $arrow }}</span>
                                 </a>
                             </th>
@@ -57,8 +59,8 @@
                                 <td>{{ $toko->created_at->format('d M Y') }}</td>
                                 <td>
                                     {{-- PENJELASAN: Menggunakan ikon untuk tombol aksi agar ringkas & konsisten. --}}
-                                    <a href="{{ route('toko.edit', $toko->id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
-                                    <form action="{{ route('toko.destroy', $toko->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Sangat Yakin? Menghapus toko ini akan menghapus SEMUA produk, ekspedisi, dan merchant yang terhubung dengannya!')">
+                                    <a href="{{ route('superadmin.toko.edit', $toko->id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <form action="{{ route('superadmin.toko.destroy', $toko->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Sangat Yakin? Menghapus toko ini akan menghapus SEMUA produk, ekspedisi, dan merchant yang terhubung dengannya!')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></button>

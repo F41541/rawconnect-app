@@ -31,7 +31,7 @@ class LaporanController extends Controller
 
         $laporanPenjualan = $query->paginate(20); // Paginasi agar tidak berat
 
-        return view('superadmin.laporan.index', [
+        return view('superadmin.laporan.penjualan', [
             'title' => 'Laporan Penjualan',
             'laporan' => $laporanPenjualan,
         ]);

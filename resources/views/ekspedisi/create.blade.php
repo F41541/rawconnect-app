@@ -6,7 +6,7 @@
                 <div class="card">
                     <div class="card-header">Tambah Ekspedisi Baru</div>
                     <div class="card-body">
-                        <form action="{{ route('ekspedisi.store') }}" method="POST">
+                        <form action="{{ route('superadmin.ekspedisi.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama Ekspedisi</label>
@@ -14,7 +14,7 @@
                                 @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('ekspedisi.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.ekspedisi.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>

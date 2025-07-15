@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header">Edit Toko: {{ $toko->name }}</div>
                     <div class="card-body">
-                        <form action="{{ route('toko.update', $toko->id) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('superadmin.toko.update', $toko->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -33,7 +33,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end mt-4">
-                                <a href="{{ route('toko.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.toko.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </form>

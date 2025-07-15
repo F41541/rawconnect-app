@@ -7,7 +7,7 @@
         </div>
         <div class="card-body">
             {{-- Form Filter Tanggal --}}
-            <form method="GET" action="{{ route('laporan.index') }}" class="row g-3 mb-4 align-items-end">
+            <form method="GET" action="{{ route('superadmin.laporan.penjualan') }}" class="row g-3 mb-4 align-items-end">
                 <div class="col-md-3">
                     <label for="tanggal_mulai" class="form-label">Dari Tanggal</label>
                     <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}">
@@ -20,7 +20,7 @@
                     <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
                 <div class="col-md-2">
-                    <a href="{{ route('laporan.index') }}" class="btn btn-secondary w-100">Reset</a>
+                    <a href="{{ route('superadmin.laporan.penjualan') }}" class="btn btn-secondary w-100">Reset</a>
                 </div>
             </form>
 

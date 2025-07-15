@@ -98,7 +98,20 @@
             </li>
             {{-- Menggunakan dropdown agar rapi --}}
             <li class="nav-item">
-                @php $isAdminActive = request()->routeIs('superadmin.*'); @endphp
+                @php
+                $isAdminActive =
+                    request()->routeIs('superadmin.*') ||
+                    request()->routeIs('user.*') ||
+                    request()->routeIs('master.index') ||
+                    request()->routeIs('toko.*') ||
+                    request()->routeIs('produk.*') ||
+                    request()->routeIs('kategori.*') ||
+                    request()->routeIs('jenis-produk.*') ||
+                    request()->routeIs('merchant.*') ||
+                    request()->routeIs('ekspedisi.*') ||
+                    request()->routeIs('layanan-pengiriman.*') ||
+                    request()->routeIs('laporan.penjualan');
+                @endphp
                 <button class="btn text-start d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#adminMenu" aria-expanded="{{ $isAdminActive ? 'true' : 'false' }}">
                     <span class="d-flex align-items-center"><i class="bi bi-gear-wide-connected me-2"></i> Administrasi</span>
                     <i class="bi bi-chevron-down rotate-icon"></i>
@@ -106,17 +119,17 @@
                 <div class="collapse {{ $isAdminActive ? 'show' : '' }}" id="adminMenu">
                     <ul class="list-unstyled mb-0 sidebar-submenu">
                         <li>
-                            <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('user.index') }}">
+                            <a class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}" href="{{ route('superadmin.user.index') }}">
                                 <i class="bi bi-people-fill me-2"></i>Manajemen Pengguna
                             </a>
                         </li>
                         <li>
-                            <a class="nav-link {{ request()->routeIs('master.index') || request()->routeIs('superadmin.toko.*') || request()->routeIs('superadmin.produk.*') ? 'active' : '' }}" href="{{ route('master.index') }}">
+                            <a class="nav-link {{ request()->routeIs('superadmin.master.index') || request()->routeIs('toko.*') || request()->routeIs('produk.*') || request()->routeIs('kategori.*') || request()->routeIs('jenis-produk.*') || request()->routeIs('merchant.*')  || request()->routeIs('ekspedisi.*') || request()->routeIs('layanan-pengiriman.*') ? 'active' : '' }}" href="{{ route('superadmin.master.index') }}">
                                 <i class="bi bi-hdd-stack-fill me-2"></i>Manajemen Master
                             </a>
                         </li>
                         <li>
-                            <a class="nav-link {{ request()->routeIs('laporan.index') ? 'active' : '' }}" href="{{ route('laporan.index') }}">
+                            <a class="nav-link {{ request()->routeIs('superadmin.laporan.penjualan') ? 'active' : '' }}" href="{{ route('superadmin.laporan.penjualan') }}">
                                 <i class="bi bi-file-earmark-bar-graph-fill me-2"></i>Laporan Penjualan
                             </a>
                         </li>
@@ -149,3 +162,5 @@
     </ul>
 </div>
 <div class="overlay" id="overlay"></div>
+
+

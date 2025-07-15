@@ -60,9 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // --- GRUP 4: RUTE HANYA UNTUK SUPER ADMIN ---
-    Route::middleware('can:is-super-admin')->prefix('superadmin')->group(function() {
+    Route::middleware('can:is-super-admin')->prefix('superadmin')->name('superadmin.')->group(function() {
         Route::get('/master', [MasterController::class, 'index'])->name('master.index');
-        Route::get('/laporan', [LaporanController::class, 'penjualan'])->name('laporan.index');
+        Route::get('/laporan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
+        Route::get('/log/stok', [LogController::class, 'stokLog'])->name('log.stok');
         Route::resource('user', UserController::class);
         Route::resource('toko', TokoController::class);
         Route::resource('jenis-produk', JenisProdukController::class);

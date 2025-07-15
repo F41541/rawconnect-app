@@ -33,10 +33,10 @@ class DatabaseSeeder extends Seeder
         );
 
         // TUGAS 2: Panggil seeder data contoh HANYA JIKA lingkungan adalah 'local'
-        if (app()->environment('local')) {
-            $this->call([
-                ProdukSeeder::class,
-            ]);
-        }
+        // if (app()->environment('local')) {
+        //     $this->call([
+        //         ProdukSeeder::class,
+        //     ]);
+        // }
     }
 }

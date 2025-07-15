@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header">Tambah Toko Baru</div>
                     <div class="card-body">
-                        <form action="{{ route('toko.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('superadmin.toko.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama Toko</label>
@@ -27,7 +27,7 @@
                                 @enderror
                             </div>
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('toko.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.toko.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
