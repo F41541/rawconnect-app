@@ -58,23 +58,24 @@ class PaketPengirimanController extends Controller
         $user = auth()->user();
         $data = [];
 
-        // --- Data Ringkasan Paket ---
+        // --- Data Kartu Ringkasan ---
         $data['jumlah_proses'] = PaketPengiriman::where('status', 'proses')->count();
         $data['jumlah_selesai'] = PaketPengiriman::where('status', 'selesai')->count();
         $data['jumlah_dibatalkan'] = PaketPengiriman::where('status', 'dibatalkan')->count();
 
-        // --- Data Stok Rendah ---
+        // --- Data Widget Stok Rendah (untuk Pegawai & Admin) ---
         if ($user->can('adjust-stock')) {
             $data['produk_stok_rendah'] = Produk::where('stok', '<=', 10)->where('stok', '>', 0)->orderBy('stok', 'asc')->limit(5)->get();
         }
 
-        // --- Data Penjualan Super Admin ---
+        // --- Data Widget Penjualan (untuk Super Admin) ---
         if ($user->can('is-super-admin')) {
-            $data['penjualan_hari_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) => $q->where('status', 'selesai')->whereDate('created_at', now()->toDateString()))->sum('jumlah');
+            $today = now()->toDateString();
+            $data['penjualan_hari_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) => $q->where('status', 'selesai')->whereDate('created_at', $today))->sum('jumlah');
             $data['penjualan_bulan_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) => $q->where('status', 'selesai')->whereMonth('created_at', now()->month))->sum('jumlah');
         }
 
-        // Panggil method pembantu untuk mengambil semua data grafik
+        // Panggil satu method pembantu untuk mengambil SEMUA data grafik
         $chartData = $this->getChartData();
 
         // Gabungkan data grafik ke dalam array data utama
@@ -86,44 +87,49 @@ class PaketPengirimanController extends Controller
         ]);
     }
 
-    // ==========================================================
-    // == METHOD PEMBANTU BARU UNTUK SEMUA LOGIKA GRAFIK ==
-    // ==========================================================
+    /**
+     * Method pembantu pribadi untuk mengambil dan memproses semua data untuk grafik.
+     */
     private function getChartData(): array
     {
         $data = [];
         $sevenDaysAgo = now()->subDays(6)->startOfDay();
-
-        // --- Data untuk Grafik Penjualan ---
+        $dateRange = collect(range(0, 6))->map(fn($day) => now()->subDays(6 - $day));
+        
+        // --- Data untuk Grafik Penjualan 7 Hari ---
         $salesData = ItemPaket::whereHas('paketPengiriman', function($q) use ($sevenDaysAgo) {
                 $q->where('status', 'selesai')->where('created_at', '>=', $sevenDaysAgo);
             })
             ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah) as total'))
             ->groupBy('tanggal')->orderBy('tanggal', 'asc')->get()->keyBy('tanggal');
-        
-        // --- Data untuk Grafik Stok Masuk vs Keluar ---
-        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)
-            ->where('created_at', '>=', $sevenDaysAgo)
-            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
-            ->groupBy('tanggal')->get()->keyBy('tanggal');
             
-        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)
-            ->where('created_at', '>=', $sevenDaysAgo)
-            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
-            ->groupBy('tanggal')->get()->keyBy('tanggal');
-        
-        // Siapkan rentang tanggal untuk 7 hari terakhir
-        $dateRange = collect(range(0, 6))->map(fn($day) => now()->subDays(6 - $day));
-
-        // Format data untuk dikirim ke view
         $data['chartLabels'] = $dateRange->map(fn($date) => $date->format('d M'))->toArray();
         $data['chartData'] = $dateRange->map(fn($date) => $salesData->get($date->format('Y-m-d'))->total ?? 0)->toArray();
-        $data['stockChartLabels'] = $data['chartLabels']; // Labelnya sama
+
+        // --- Data untuk Grafik Stok Masuk vs Keluar ---
+        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)->where('created_at', '>=', $sevenDaysAgo)
+            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)->where('created_at', '>=', $sevenDaysAgo)
+            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+
+        $data['stockChartLabels'] = $data['chartLabels'];
         $data['stockMasukData'] = $dateRange->map(fn($date) => $stokMasukData->get($date->format('Y-m-d'))->total ?? 0)->toArray();
         $data['stockKeluarData'] = $dateRange->map(fn($date) => abs($stokKeluarData->get($date->format('Y-m-d'))->total ?? 0))->toArray();
 
+        // --- Data untuk Grafik Penjualan per Merchant ---
+        $salesByMerchant = PaketPengiriman::where('status', 'selesai')
+            ->join('merchants', 'paket_pengiriman.merchant_id', '=', 'merchants.id')
+            ->select('merchants.name as nama_merchant', DB::raw('count(*) as total'))
+            ->groupBy('merchants.name')->orderBy('total', 'desc')->get();
+
+        $data['merchantLabels'] = $salesByMerchant->pluck('nama_merchant');
+        $data['merchantData'] = $salesByMerchant->pluck('total');
+
         return $data;
     }
+
 
     /**
      * Menampilkan form untuk menambah item ke pratinjau.
