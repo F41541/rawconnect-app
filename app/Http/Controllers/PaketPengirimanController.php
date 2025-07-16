@@ -53,8 +53,11 @@ class PaketPengirimanController extends Controller
         ]);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+            // Ambil tanggal dari request, jika tidak ada, defaultnya 7 hari terakhir
+        $tanggalMulai = $request->input('tanggal_mulai', now()->subDays(6)->toDateString());
+        $tanggalSelesai = $request->input('tanggal_selesai', now()->toDateString());
         $user = auth()->user();
         $data = [];
 
@@ -93,12 +96,18 @@ class PaketPengirimanController extends Controller
     private function getChartData(): array
     {
         $data = [];
-        $sevenDaysAgo = now()->subDays(6)->startOfDay();
-        $dateRange = collect(range(0, 6))->map(fn($day) => now()->subDays(6 - $day));
-        
-        // --- Data untuk Grafik Penjualan 7 Hari ---
-        $salesData = ItemPaket::whereHas('paketPengiriman', function($q) use ($sevenDaysAgo) {
-                $q->where('status', 'selesai')->where('created_at', '>=', $sevenDaysAgo);
+        // Ambil tanggal dari request (via query string), default 7 hari terakhir
+        $tanggalMulai = request('tanggal_mulai', now()->subDays(6)->toDateString());
+        $tanggalSelesai = request('tanggal_selesai', now()->toDateString());
+
+        // Buat range tanggal untuk label grafik
+        $dateRange = collect(range(0, (strtotime($tanggalSelesai) - strtotime($tanggalMulai)) / 86400))
+            ->map(fn($day) => \Carbon\Carbon::parse($tanggalMulai)->addDays($day));
+
+        // --- Data untuk Grafik Penjualan 7 Hari (atau range yang dipilih) ---
+        $salesData = ItemPaket::whereHas('paketPengiriman', function($q) use ($tanggalMulai, $tanggalSelesai) {
+                $q->where('status', 'selesai')
+                  ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai]);
             })
             ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah) as total'))
             ->groupBy('tanggal')->orderBy('tanggal', 'asc')->get()->keyBy('tanggal');
@@ -107,10 +116,12 @@ class PaketPengirimanController extends Controller
         $data['chartData'] = $dateRange->map(fn($date) => $salesData->get($date->format('Y-m-d'))->total ?? 0)->toArray();
 
         // --- Data untuk Grafik Stok Masuk vs Keluar ---
-        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)->where('created_at', '>=', $sevenDaysAgo)
+        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
             ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
             ->groupBy('tanggal')->get()->keyBy('tanggal');
-        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)->where('created_at', '>=', $sevenDaysAgo)
+        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
             ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
             ->groupBy('tanggal')->get()->keyBy('tanggal');
 
@@ -120,6 +131,7 @@ class PaketPengirimanController extends Controller
 
         // --- Data untuk Grafik Penjualan per Merchant ---
         $salesByMerchant = PaketPengiriman::where('status', 'selesai')
+            ->whereBetween(DB::raw('DATE(paket_pengiriman.created_at)'), [$tanggalMulai, $tanggalSelesai])
             ->join('merchants', 'paket_pengiriman.merchant_id', '=', 'merchants.id')
             ->select('merchants.name as nama_merchant', DB::raw('count(*) as total'))
             ->groupBy('merchants.name')->orderBy('total', 'desc')->get();

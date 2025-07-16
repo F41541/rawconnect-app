@@ -35,16 +35,25 @@
             {{-- TAB UNTUK STATUS 'PROSES' --}}
             <div class="tab-pane fade show active" id="proses" role="tabpanel">
                 @include('pengiriman.partials.paket-list', ['pakets' => $paket_proses])
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $paket_proses->links() }}
+                    </div>
             </div>
 
             {{-- TAB UNTUK STATUS 'SELESAI' --}}
             <div class="tab-pane fade" id="selesai" role="tabpanel">
                 @include('pengiriman.partials.paket-list', ['pakets' => $paket_selesai])
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $paket_proses->links() }}
+                    </div>
             </div>
 
             {{-- TAB UNTUK STATUS 'DIBATALKAN' --}}
             <div class="tab-pane fade" id="dibatalkan" role="tabpanel">
                 @include('pengiriman.partials.paket-list', ['pakets' => $paket_dibatalkan])
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $paket_proses->links() }}
+                    </div>
             </div>
         </div>
     </div>
