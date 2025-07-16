@@ -92,7 +92,6 @@ class StokAdjustmentController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi input (tambahkan 'keterangan')
         $validatedData = $request->validate([
             'produk_id'   => 'required|exists:produks,id',
             'jumlah'      => 'required|integer|min:1',
@@ -104,32 +103,30 @@ class StokAdjustmentController extends Controller
         try {
             $produk = Produk::lockForUpdate()->findOrFail($validatedData['produk_id']);
             $jumlah = (int)$validatedData['jumlah'];
-            $keterangan = $validatedData['keterangan'];
+            // PERBAIKAN: Gunakan null coalescing operator untuk keamanan
+            $keterangan = $validatedData['keterangan'] ?? null; 
 
-            // 2. Lakukan aksi berdasarkan tombol yang diklik
             if ($validatedData['tipe'] === 'masuk') {
-                // Catat log DULU, baru ubah stok
                 $produk->recordStockChange($jumlah, 'penyesuaian', $keterangan);
                 $produk->increment('stok', $jumlah);
-
+                $actionText = 'ditambahkan';
             } else { // Jika 'keluar'
                 if ($produk->stok < $jumlah) {
                     DB::rollBack();
                     return redirect()->back()->withInput()->with('error', 'Gagal! Stok saat ini ('. $produk->stok .') lebih kecil dari jumlah yang ingin dikurangi ('. $jumlah .').');
                 }
-                // Catat log DULU (dengan angka negatif), baru ubah stok
                 $produk->recordStockChange(-$jumlah, 'penyesuaian', $keterangan);
                 $produk->decrement('stok', $jumlah);
+                $actionText = 'dikurangi';
             }
-
-            // Method increment/decrement sudah otomatis save, jadi $produk->save() tidak perlu lagi
             DB::commit();
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan. Stok gagal diupdate.');
+            // Tambahkan pesan error yang lebih detail untuk debugging kita
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
 
-        return redirect()->route('stok-adj.index')->with('success', 'Stok berhasil diupdate!')->withInput();
+        return redirect()->route('stok-adj.index')->with('success', 'Stok untuk "'. $produk->nama .'" berhasil '. $actionText .'!');
     }
 }

@@ -45,7 +45,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('can:adjust-stock')->group(function() {
         Route::get('/stok-adjustment', [StokAdjustmentController::class, 'index'])->name('stok-adj.index');
         Route::patch('/stok/koreksi/{produk}', [ProdukController::class, 'koreksiStok'])->name('stok.koreksi');
-        
         Route::post('/stok-adjustment', [StokAdjustmentController::class, 'store'])->name('stok-adj.store');
     });
 
@@ -63,7 +62,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('can:is-super-admin')->prefix('superadmin')->name('superadmin.')->group(function() {
         Route::get('/master', [MasterController::class, 'index'])->name('master.index');
         Route::get('/laporan', [LaporanController::class, 'penjualan'])->name('laporan.penjualan');
-        Route::get('/log/stok', [LogController::class, 'stokLog'])->name('log.stok');
         Route::resource('user', UserController::class);
         Route::resource('toko', TokoController::class);
         Route::resource('jenis-produk', JenisProdukController::class);

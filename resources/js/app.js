@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stockKeluar = JSON.parse(pageDataEl.dataset.stockChartKeluar);
         new Chart(stockChartCanvas, {
             type: 'bar', data: { labels: labels, datasets: [ { label: 'Stok Masuk', data: stockMasuk, backgroundColor: 'rgba(25, 135, 84, 0.7)' }, { label: 'Stok Keluar', data: stockKeluar, backgroundColor: 'rgba(220, 53, 69, 0.7)' } ] },
-            options: { scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } }, responsive: true, maintainAspectRatio: false }
+            options: { scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true, ticks: { precision: 0 } } }, responsive: true, maintainAspectRatio: false }
         });
     }
 

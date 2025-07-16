@@ -98,7 +98,7 @@ class UserController extends Controller
         $user->update($validatedData);
 
         // 4. Redirect kembali ke halaman daftar dengan pesan sukses
-        return redirect()->route('user.index')->with('success', 'Data pengguna berhasil diperbarui!');
+        return redirect()->route('superadmin.user.index')->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
     /**
@@ -108,13 +108,13 @@ class UserController extends Controller
     {
         // Pengaman tambahan: pastikan Super Admin tidak bisa menghapus akunnya sendiri
         if ($user->id === auth()->id()) {
-            return redirect()->route('user.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return redirect()->route('superadmin.user.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         // Hapus pengguna dari database
         $user->delete();
 
         // Redirect kembali dengan pesan sukses
-        return redirect()->route('user.index')->with('success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('superadmin.user.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

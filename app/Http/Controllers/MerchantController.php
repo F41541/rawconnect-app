@@ -56,7 +56,7 @@ class MerchantController extends Controller
 
         Merchant::create($validatedData);
 
-        return redirect()->route('merchant.index')->with('success', 'Merchant baru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Merchant baru berhasil ditambahkan!');
     }
 
     /**
@@ -83,7 +83,7 @@ class MerchantController extends Controller
 
         $merchant->update($validatedData);
 
-        return redirect(session('index_return_url', route('merchant.index')))
+        return redirect(session('index_return_url', route('superadmin.merchant.index')))
                    ->with('success', 'Merchant berhasil diperbarui!');
     }
 

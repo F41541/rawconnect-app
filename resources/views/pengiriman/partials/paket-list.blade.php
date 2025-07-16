@@ -85,20 +85,57 @@
                 {{ $paket->created_at->format('H:i') }} | {{ optional($paket->user)->name ?? 'N/A' }}
             </small>
             <div>
-                <form action="{{ route('paket.updateStatus', $paket->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <select name="status" class="form-select form-select-sm {{ $paket->status == 'proses' ? 'status-proses' : ($paket->status == 'selesai' ? 'status-selesai' : 'status-dibatalkan') }}" onchange="this.form.submit()" style="width: 130px;">
-                        <option value="proses" {{ $paket->status == 'proses' ? 'selected' : '' }}>Proses</option>
-                        <option value="selesai" {{ $paket->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                        
-                        {{-- PERBAIKAN HAK AKSES: Menggunakan Gate 'batalkan-pengiriman' yang lebih spesifik --}}
-                        @can('cancel-shipments')
-                            <option value="dibatalkan" {{ $paket->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
-                        @endcan
-                    </select>
-                </form>
+                {{-- Tampilkan tombol-tombol ini HANYA jika statusnya 'proses' --}}
+                @if ($paket->status == 'proses')
+
+                    {{-- Tombol Batalkan (hanya untuk Admin & Super Admin) --}}
+                    @can('cancel-shipment')
+                        <form action="{{ route('paket.updateStatus', $paket->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="dibatalkan">
+                            <button type="submit" class="btn btn-sm btn-danger">Batalkan</button>
+                        </form>
+                    @endcan
+
+                    {{-- Tombol Selesaikan (untuk semua peran operasional) --}}
+                    @can('update-status')
+                        <form action="{{ route('paket.updateStatus', $paket->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="selesai">
+                            <button type="submit" class="btn btn-sm btn-success">Selesaikan</button>
+                        </form>
+                    @endcan
+
+                {{-- Tampilkan tombol ini HANYA jika statusnya 'selesai' --}}
+                @elseif ($paket->status == 'selesai')
+
+                    {{-- Tombol Batalkan (hanya untuk Admin & Super Admin) --}}
+                    @can('cancel-shipment')
+                        <form action="{{ route('paket.updateStatus', $paket->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="dibatalkan">
+                            <button type="submit" class="btn btn-sm btn-warning">Tandai Batal</button>
+                        </form>
+                    @endcan
+                
+                @elseif ($paket->status == 'dibatalkan')
+
+                    @can('cancel-shipment') {{-- Menggunakan izin yang sama dengan 'Batalkan' --}}
+                        <form action="{{ route('paket.updateStatus', $paket->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="proses">
+                            <button type="submit" class="btn btn-sm btn-secondary">Kembali ke Proses</button>
+                        </form>
+                    @endcan
+
+                @endif
+                {{-- Tidak ada tombol jika statusnya 'dibatalkan', sesuai permintaan Anda --}}
             </div>
+
         </div>
     </div>
 @empty

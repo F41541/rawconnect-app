@@ -94,6 +94,6 @@ class LayananPengirimanController extends Controller
     {
         $layananPengiriman->delete();
 
-        return redirect()->route('layanan-pengiriman.index')->with('success', 'Layanan berhasil dihapus.');
+        return redirect()->back()->with('success', 'Layanan berhasil dihapus.');
     }
 }

@@ -90,7 +90,7 @@ class JenisProdukController extends Controller
         
         $jenisProduk->kategoris()->sync($request->kategoris);
 
-        return redirect(session('index_return_url', route('jenis-produk.index')))
+        return redirect(session('index_return_url', route('superadmin.jenis-produk.index')))
                    ->with('success', 'Jenis Produk berhasil diperbarui!');
     }
 

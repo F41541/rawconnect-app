@@ -4,8 +4,8 @@
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <a href="{{ route('pengiriman.create') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali ke Form
+                <a href="{{ route('pengiriman.create') }}" class="btn btn-outline-secondary" title="Kembali">
+                    <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
             @if($groupedItems->isNotEmpty())

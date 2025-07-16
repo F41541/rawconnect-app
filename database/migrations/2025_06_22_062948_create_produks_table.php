@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('foto')->nullable();
             $table->integer('stok')->default(0);
+            $table->integer('minimal_stok')->default(10);
             $table->enum('satuan', ['pouch', 'gram', 'kg', 'pcs', 'roll', 'pack'])->default('pcs');
             $table->foreignId('jenis_produk_id')->constrained('jenis_produks')->onDelete('restrict');
             $table->foreignId('toko_id')->constrained('tokos')->onDelete('restrict');

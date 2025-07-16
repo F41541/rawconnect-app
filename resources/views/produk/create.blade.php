@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header">Tambah Produk Baru</div>
                     <div class="card-body">
-                        <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('superadmin.produk.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             {{-- NAMA PRODUK (Input Teks) --}}
@@ -52,6 +52,12 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="minimal_stok" class="form-label">Jumlah Minimal Stok</label>
+                                <input type="number" name="minimal_stok" id="minimal_stok" class="form-control" value="{{ old('minimal_stok', $produk->minimal_stok ?? 10) }}" required>
+                                <div class="form-text">Peringatan akan muncul jika stok produk ini di bawah atau sama dengan angka ini.</div>
+                            </div>                           
+
+                            <div class="mb-3">
                                 <label for="satuan" class="form-label">Satuan</label>
                                 <select class="form-select @error('satuan') is-invalid @enderror" id="satuan" name="satuan" required>
                                     <option value="" selected disabled>Pilih Satuan...</option>
@@ -73,7 +79,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('produk.index') }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ route('superadmin.produk.index') }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Simpan Produk</button>
                             </div>
                         </form>

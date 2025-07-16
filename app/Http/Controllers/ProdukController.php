@@ -56,6 +56,7 @@ class ProdukController extends Controller
             'jenis_produk_id'   => 'required|exists:jenis_produks,id',
             'toko_id'           => 'required|exists:tokos,id',
             'stok'              => 'required|integer|min:0',
+            'minimal_stok'      => 'required|integer|min:0',
             'satuan'            => ['required',Rule::in(['pouch', 'gram', 'kg', 'pcs', 'roll', 'pack'])],
             'foto'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -95,6 +96,7 @@ class ProdukController extends Controller
             'jenis_produk_id'   => 'required|exists:jenis_produks,id',
             'toko_id'           => 'required|exists:tokos,id',
             'stok'              => 'required|integer|min:0',
+            'minimal_stok'      => 'required|integer|min:0',
             'satuan'            => ['required', Rule::in(['pouch', 'gram', 'kg', 'pcs', 'roll', 'pack'])],
             'foto'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -111,7 +113,7 @@ class ProdukController extends Controller
 
         $produk->update($validatedData);
 
-        return redirect(session('produk_return_url', route('produk.index')))
+        return redirect(session('produk_return_url', route('superadmin.produk.index')))
                    ->with('success', 'Produk berhasil diperbarui!');
     }
 

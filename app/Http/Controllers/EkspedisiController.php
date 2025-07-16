@@ -83,7 +83,7 @@ class EkspedisiController extends Controller
 
         $ekspedisi->update($validatedData);
 
-        return redirect(session('index_return_url', route('ekspedisi.index')))
+        return redirect(session('index_return_url', route('superadmin.ekspedisi.index')))
                    ->with('success', 'Ekspedisi berhasil diperbarui!');
     }
 

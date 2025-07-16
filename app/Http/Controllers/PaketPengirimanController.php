@@ -62,11 +62,11 @@ class PaketPengirimanController extends Controller
         $data['jumlah_proses'] = PaketPengiriman::where('status', 'proses')->count();
         $data['jumlah_selesai'] = PaketPengiriman::where('status', 'selesai')->count();
         $data['jumlah_dibatalkan'] = PaketPengiriman::where('status', 'dibatalkan')->count();
-
-        // --- Data Widget Stok Rendah (untuk Pegawai & Admin) ---
-        if ($user->can('adjust-stock')) {
-            $data['produk_stok_rendah'] = Produk::where('stok', '<=', 10)->where('stok', '>', 0)->orderBy('stok', 'asc')->limit(5)->get();
-        }
+        $data['produk_stok_rendah'] = Produk::whereRaw('stok <= minimal_stok')
+                                ->where('stok', '>', 0)
+                                ->orderBy('stok', 'asc')
+                                ->limit(5)
+                                ->get();
 
         // --- Data Widget Penjualan (untuk Super Admin) ---
         if ($user->can('is-super-admin')) {

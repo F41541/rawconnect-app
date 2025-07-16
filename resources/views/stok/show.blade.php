@@ -3,7 +3,11 @@
 
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Daftar Stok: {{ $jenisProduk->name }}</h2>
+          @can('is-super-admin')
+            <a href="{{ route('superadmin.produk.index') }}" class="btn btn-secondary">
+              <i class="bi bi-arrow-left me-2"></i>
+            </a>
+          @endcan
             
             <div class="d-flex align-items-center">
                 {{-- PENJELASAN: Form ini sekarang membawa 'active_kategori' agar sidebar tidak menutup --}}
@@ -22,9 +26,7 @@
                     </select>
                 </form>
 
-                <a href="{{ route('superadmin.produk.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>Kembali
-                </a>
+                
             </div>
         </div>
     

@@ -50,8 +50,14 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="search-produk" class="form-label">Cari Nama Produk</label>
-                                    <select id="search-produk" name="produk_id" placeholder="Pilih semua filter di atas, lalu ketik..." required disabled></select>
+                                    <div class="input-group">
+                                        <select id="search-produk" name="produk_id" class="form-select tom-select-no-chevron" placeholder="Pilih semua filter di atas, lalu ketik..." required disabled></select>
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="berat_varian" class="form-label">Berat/Varian</label>
                                     <input type="number" step="any" class="form-control" name="berat_varian" id="berat_varian" placeholder="Hanya aktif untuk gram" disabled>
@@ -99,7 +105,27 @@
 
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
+        <style>
+            /* Hilangkan chevron bawaan select/tom-select */
+            .tom-select-no-chevron + .ts-wrapper .ts-control > .ts-arrow,
+            .tom-select-no-chevron + .ts-wrapper .ts-dropdown .ts-arrow {
+            display: none !important;
+            }
+            .tom-select-no-chevron {
+            /* Hilangkan panah bawaan browser */
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: none !important;
+            padding-right: 2rem !important; /* ruang untuk icon search */
+            }
+            /* Kecilkan icon search di input-group */
+            .input-group-text .bi-search {
+            font-size: 1rem !important;
+            }
+        </style>
     @endpush
+
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>

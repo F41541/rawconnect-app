@@ -72,7 +72,7 @@ class KategoriController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('kategoris')->ignore($kategori->id)],
         ]);
         $kategori->update($validatedData);
-        return redirect(session('index_return_url', route('kategori.index')))
+        return redirect(session('index_return_url', route('superadmin.kategori.index')))
                    ->with('success', 'Kategori berhasil diperbarui!');
     }
 

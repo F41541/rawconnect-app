@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header">Edit Produk: {{ $produk->nama }}</div>
                     <div class="card-body">
-                        <form action="{{ route('produk.update', $produk->id) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('superadmin.produk.update', $produk->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT') {{-- Method wajib untuk update --}}
 
@@ -49,6 +49,12 @@
                                 <input type="number" class="form-control @error('stok') is-invalid @enderror" id="stok" name="stok" value="{{ old('stok', $produk->stok) }}" required>
                                 @error('stok') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
+                            
+                            <div class="mb-3">
+                                <label for="minimal_stok" class="form-label">Jumlah Minimal Stok</label>
+                                <input type="number" name="minimal_stok" id="minimal_stok" class="form-control" value="{{ old('minimal_stok', $produk->minimal_stok ?? 10) }}" required>
+                                <div class="form-text">Peringatan akan muncul jika stok produk ini di bawah atau sama dengan angka ini.</div>
+                            </div>
 
                             {{-- SATUAN --}}
                             <div class="mb-3">
@@ -81,7 +87,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <a href="{{ session('produk_return_url', route('produk.index')) }}" class="btn btn-secondary me-2">Batal</a>
+                                <a href="{{ session('produk_return_url', route('superadmin.produk.index')) }}" class="btn btn-secondary me-2">Batal</a>
                                 <button type="submit" class="btn btn-primary">Update Produk</button>
                             </div>
                         </form>

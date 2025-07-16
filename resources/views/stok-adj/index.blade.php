@@ -10,7 +10,7 @@
                         <form action="{{ route('stok-adj.store') }}" method="POST" id="stokAdjustmentForm">
                             @csrf
                             {{-- Input tersembunyi untuk menandai aksi (tambah/kurang) --}}
-                            <input type="hidden" name="action_type" id="action_type">
+                            <input type="hidden" name="tipe" id="action_type">
 
                             {{-- LANGKAH 1: PILIH TOKO --}}
                             <div class="mb-3">
@@ -41,8 +41,17 @@
 
                             {{-- LANGKAH 4: CARI PRODUK --}}
                             <div class="mb-3">
-                                <label for="search-produk" class="form-label fw-bold">4. Cari Produk</label>
-                                <select id="search-produk" name="produk_id" placeholder="Ketik nama produk..." required disabled></select>
+                                <label for="search-produk" class="form-label fw-bold">4. Cari Nama Produk</label>
+                                    <div class="input-group">
+                                        <select id="search-produk" name="produk_id" class="form-select tom-select-no-chevron" placeholder="Pilih semua filter di atas, lalu ketik..." required disabled></select>
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
+                            </div>
+                                                        <div class="mb-3">
+                                <label for="keterangan" class="form-label">Keterangan (Opsional)</label>
+                                <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Contoh: Stok masuk dari supplier A" value="{{ old('keterangan') }}">
                             </div>
                             
                             <hr class="my-4">
@@ -55,10 +64,10 @@
                                 </div>
                                 <div class="col-sm-6 mb-3 d-flex gap-2">
                                     {{-- Tombol Aksi --}}
-                                    <button type="submit" class="btn btn-warning w-100 btn-aksi" data-action="kurangi">
+                                    <button type="submit" class="btn btn-warning w-100 btn-aksi" data-action="keluar">
                                         <i class="bi bi-dash-lg"></i> Kurangi dari Stok
                                     </button>
-                                    <button type="submit" class="btn btn-success w-100 btn-aksi" data-action="tambah">
+                                    <button type="submit" class="btn btn-success w-100 btn-aksi" data-action="masuk">
                                         <i class="bi bi-plus-lg"></i> Tambah ke Stok
                                     </button>
                                 </div>
@@ -73,6 +82,25 @@
     {{-- Kita letakkan semua CSS & JS yang dibutuhkan di sini --}}
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
+        <style>
+            /* Hilangkan chevron bawaan select/tom-select */
+            .tom-select-no-chevron + .ts-wrapper .ts-control > .ts-arrow,
+            .tom-select-no-chevron + .ts-wrapper .ts-dropdown .ts-arrow {
+            display: none !important;
+            }
+            .tom-select-no-chevron {
+            /* Hilangkan panah bawaan browser */
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: none !important;
+            padding-right: 2rem !important; /* ruang untuk icon search */
+            }
+            /* Kecilkan icon search di input-group */
+            .input-group-text .bi-search {
+            font-size: 1rem !important;
+            }
+        </style>
     @endpush
 
     @push('scripts')

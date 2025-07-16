@@ -33,7 +33,11 @@ public function boot(): void
         return in_array($user->role, ['super-admin', 'admin']);
     });
 
-    Gate::define('cancel-shipments', function (User $user) {
+    Gate::define('create-shipments', function (User $user) {
+        return in_array($user->role, ['super-admin', 'admin']);
+    });
+
+    Gate::define('cancel-shipment', function (User $user) {
         return in_array($user->role, ['super-admin', 'admin']);
     });
 

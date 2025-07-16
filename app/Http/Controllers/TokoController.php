@@ -82,7 +82,7 @@ class TokoController extends Controller
 
         $toko->update($validatedData);
 
-        return redirect(session('index_return_url', route('toko.index')))
+        return redirect(session('index_return_url', route('superadmin.toko.index')))
                    ->with('success', 'Toko berhasil diperbarui!');
     }
 
@@ -90,11 +90,11 @@ class TokoController extends Controller
     {
         // PENJELASAN: Pengaman lengkap untuk semua relasi
         if ($toko->produks()->exists()) {
-            return redirect()->route('toko.index')->with('error', 'Toko "'. $toko->name .'" tidak bisa dihapus karena masih digunakan oleh Produk');
+            return redirect()->back()->with('error', 'Toko "'. $toko->name .'" tidak bisa dihapus karena masih digunakan oleh Produk');
         }
 
         if ($toko->layananPengiriman()->exists()) {
-            return redirect()->route('toko.index')->with('error', 'Toko "'. $toko->name .'" tidak bisa dihapus karena masih digunakan  Layanan Pengiriman');
+            return redirect()->back()->with('error', 'Toko "'. $toko->name .'" tidak bisa dihapus karena masih digunakan  Layanan Pengiriman');
         }
 
 
@@ -102,6 +102,6 @@ class TokoController extends Controller
             Storage::disk('uploads')->delete('logo_toko/' . $toko->logo);
         }
         $toko->delete();
-        return redirect()->route('toko.index')->with('success', 'Toko berhasil dihapus!');
+        return redirect()->back()->with('success', 'Toko berhasil dihapus!');
     }
 }
