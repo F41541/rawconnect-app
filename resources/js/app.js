@@ -1,5 +1,6 @@
 import './bootstrap';
 import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 import jQuery from 'jquery';
 window.$ = window.jQuery = jQuery;
 import toastr from 'toastr';
@@ -33,8 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const labels = JSON.parse(pageDataEl.dataset.salesChartLabels);
         const values = JSON.parse(pageDataEl.dataset.salesChartValues);
         new Chart(salesChartCanvas, {
-            type: 'line', data: { labels: labels, datasets: [{ label: 'Item Terjual', data: values, fill: true, backgroundColor: 'rgba(13, 110, 253, 0.1)', borderColor: 'rgba(13, 110, 253, 1)', tension: 0.3 }] },
-            options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, responsive: true, maintainAspectRatio: false }
+            type: 'line', data: { labels: labels, datasets: [{ label: 'Item Terjual', data: values, fill: true, backgroundColor: 'rgba(13, 110, 253, 0.1)', borderColor: 'rgba(13, 110, 253, 1)', tension: 0 }] },
+            options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}
+        }
         });
     }
 

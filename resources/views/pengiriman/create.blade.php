@@ -1,20 +1,22 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container py-4">
-        <div class="row justify-content-center align-items-center">
-                <div class="card">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="card shadow-sm rounded-4">
                     <div class="card-body p-4">
+
                         <form id="pengirimanForm" action="{{ route('pengiriman.tambah') }}" method="POST">
                             @csrf
                             <input type="hidden" name="action_type" id="action_type" value="pratinjau">
 
-                            {{-- ===== BAGIAN DETAIL PENGIRIMAN ===== --}}
-                            <fieldset>
-                                <legend class="h6 mb-3 fw-bold border-bottom pb-2">Langkah 1: Detail Pengiriman</legend>
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label for="toko_id" class="form-label">Pilih Toko</label>
+                            {{-- LANGKAH 1 --}}
+                            <fieldset class="mb-4">
+                                <legend class="fs-6 fw-bold mb-3 text-primary border-bottom pb-2">Langkah 1: Detail Pengiriman</legend>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="toko_id" class="form-label fw-medium">Pilih Toko</label>
                                         <select class="form-select" id="toko_id" name="toko_id" required>
                                             <option value="" selected disabled>-- Pilih Toko --</option>
                                             @foreach ($tokos as $toko)
@@ -22,14 +24,14 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="merchant_id" class="form-label">Pilih Merchant</label>
+                                    <div class="col-md-4">
+                                        <label for="merchant_id" class="form-label fw-medium">Pilih Merchant</label>
                                         <select class="form-select" id="merchant_id" name="merchant_id" required disabled>
                                             <option value="">-- Pilih Toko dahulu --</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="ekspedisi_id" class="form-label">Pilih Ekspedisi</label>
+                                    <div class="col-md-4">
+                                        <label for="ekspedisi_id" class="form-label fw-medium">Pilih Ekspedisi</label>
                                         <select class="form-select" id="ekspedisi_id" name="ekspedisi_id" required disabled>
                                             <option value="">-- Pilih Merchant dahulu --</option>
                                         </select>
@@ -37,69 +39,61 @@
                                 </div>
                             </fieldset>
 
-                            <hr class="my-4">
-
-                            {{-- ===== BAGIAN DETAIL PRODUK ===== --}}
+                            {{-- LANGKAH 2 --}}
                             <fieldset>
-                                <legend class="h6 mb-3 fw-bold border-bottom pb-2">Langkah 2: Detail Produk</legend>
+                                <legend class="fs-6 fw-bold mb-3 text-primary border-bottom pb-2">Langkah 2: Detail Produk</legend>
                                 <div class="mb-3">
-                                    <label for="jenis_produk_id" class="form-label">Pilih Jenis Produk</label>
+                                    <label for="jenis_produk_id" class="form-label fw-medium">Pilih Jenis Produk</label>
                                     <select class="form-select" id="jenis_produk_id" name="jenis_produk_id" required disabled>
                                         <option value="">-- Pilih Kategori dahulu --</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="search-produk" class="form-label">Cari Nama Produk</label>
+                                    <label for="search-produk" class="form-label fw-medium">Cari Nama Produk</label>
                                     <div class="input-group">
-                                        <select id="search-produk" name="produk_id" class="form-select tom-select-no-chevron" placeholder="Pilih semua filter di atas, lalu ketik..." required disabled></select>
-                                        <span class="input-group-text">
-                                            <i class="bi bi-search"></i>
-                                        </span>
+                                        <select id="search-produk" name="produk_id" class="form-select tom-select-no-chevron" required disabled></select>
+                                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                     </div>
                                 </div>
-                                
                                 <div class="mb-3">
-                                    <label for="berat_varian" class="form-label">Berat/Varian</label>
-                                    <input type="number" step="any" class="form-control" name="berat_varian" id="berat_varian" placeholder="Hanya aktif untuk gram" disabled>
-                                    <div class="form-text">Input ini hanya aktif jika produk yang dipilih satuannya 'gram'.</div>
+                                    <label for="berat_varian" class="form-label fw-medium">Berat / Varian</label>
+                                    <input type="number" step="any" class="form-control" name="berat_varian" id="berat_varian" placeholder="Hanya untuk satuan gram" disabled>
+                                    <small class="text-muted">Aktif hanya untuk produk dengan satuan gram.</small>
                                 </div>
-                                <div class="mb-4">
-                                    <label for="jumlah" class="form-label d-block text-center">Jumlah</label>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium d-block text-center mb-2">Jumlah</label>
                                     <div class="d-flex justify-content-center">
-                                        <div style="max-width: 200px;">
-                                            <div class="input-group">
-                                                <button class="btn btn-outline-secondary" type="button" onclick="decrement()">-</button>
-                                                <input type="number" class="form-control text-center no-spinner" name="jumlah" id="jumlah" value="{{ old('jumlah', 1) }}" min="1" required>
-                                                <button class="btn btn-outline-secondary" type="button" onclick="increment()">+</button>
-                                            </div>
+                                        <div class="input-group" style="max-width: 200px;">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="decrement()">-</button>
+                                            <input type="number" class="form-control text-center" name="jumlah" id="jumlah" value="1" min="1" required>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="increment()">+</button>
                                         </div>
                                     </div>
                                 </div>
                             </fieldset>
 
-                            <div class="row mt-4">
-                                <div class="col-12 mb-2">
-                                    <button type="submit" class="btn btn-primary btn-aksi w-100 d-flex align-items-center justify-content-center" data-action="pratinjau">
-                                        <i class="bi bi-plus-circle me-2"></i>
-                                        <span class="align-middle">Tambah ke Pratinjau</span>
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary w-100 btn-aksi" data-action="pratinjau">
+                                        <i class="bi bi-plus-circle me-2"></i>Tambah ke Pratinjau
                                     </button>
                                 </div>
-                                <div class="col-6 mb-2 d-flex">
-                                    <a href="{{ route('pengiriman.pratinjau') }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-eye me-2"></i>
-                                        <span class="align-middle">Lihat Pratinjau</span>
+                                <div class="col-6">
+                                    <a href="{{ route('pengiriman.pratinjau') }}" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-eye me-2"></i>Lihat Pratinjau
                                     </a>
                                 </div>
-                                <div class="col-6 mb-2 d-flex">
-                                    <button type="submit" class="btn btn-success btn-aksi w-100 d-flex align-items-center justify-content-center" data-action="langsung">
-                                        <i class="bi bi-send me-2"></i>
-                                        <span class="align-middle">Kirim</span>
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-success w-100 btn-aksi" data-action="langsung">
+                                        <i class="bi bi-send me-2"></i>Kirim
                                     </button>
                                 </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
+            </div>
         </div>
     </div>
 
@@ -121,7 +115,7 @@
             }
             /* Kecilkan icon search di input-group */
             .input-group-text .bi-search {
-            font-size: 1rem !important;
+            font-size: 1.2rem !important;
             }
         </style>
     @endpush

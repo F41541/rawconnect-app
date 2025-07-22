@@ -1,63 +1,57 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container py-4">
+    <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          @can('is-super-admin')
-            <a href="{{ route('superadmin.produk.index') }}" class="btn btn-secondary">
-              <i class="bi bi-arrow-left me-2"></i>
-            </a>
-          @endcan
-            
-            <div class="d-flex align-items-center">
-                {{-- PENJELASAN: Form ini sekarang membawa 'active_kategori' agar sidebar tidak menutup --}}
-                <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center me-3">
-                    <input type="hidden" name="sort" value="{{ request('sort', 'nama') }}">
-                    <input type="hidden" name="order" value="{{ request('order', 'asc') }}">
-                    <input type="hidden" name="active_kategori" value="{{ request('active_kategori') }}">
-                    
-                    <label for="per_page_top" class="form-label me-2 mb-0 text-muted"><small>Tampil:</small></label>
-                    @php $perPage = request('per_page', 15); @endphp
-                    <select class="form-select form-select-sm" style="width: auto;" name="per_page" id="per_page_top" onchange="this.form.submit()">
-                        <option value="15" {{ $perPage == 15 ? 'selected' : '' }}>15</option>
-                        <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
-                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-                        <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
-                    </select>
-                </form>
+            @can('is-super-admin')
+                <a href="{{ route('superadmin.produk.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i> Kembali
+                </a>
+            @endcan
 
-                
-            </div>
+            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="sort" value="{{ request('sort', 'nama') }}">
+                <input type="hidden" name="order" value="{{ request('order', 'asc') }}">
+                <input type="hidden" name="active_kategori" value="{{ request('active_kategori') }}">
+
+                <label for="per_page_top" class="form-label mb-0 small text-muted">Tampil:</label>
+                @php $perPage = request('per_page', 15); @endphp
+                <select class="form-select form-select-sm" name="per_page" id="per_page_top" style="width: auto;" onchange="this.form.submit()">
+                    @foreach ([15, 25, 50, 100] as $option)
+                        <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
+                </select>
+            </form>
         </div>
-    
-        @include('stok.partials.tabel-produk', ['produks' => $produks, 'sortField' => $sortField, 'sortOrder' => $sortOrder])
 
+        @include('stok.partials.tabel-produk', ['produks' => $produks, 'sortField' => $sortField, 'sortOrder' => $sortOrder])
     </div>
 
-    <!-- Modal untuk Koreksi Stok -->
+    <!-- Modal Koreksi Stok -->
     <div class="modal fade" id="koreksiStokModal" tabindex="-1" aria-labelledby="koreksiStokModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="koreksiStokModalLabel">Koreksi Stok</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form action="" method="POST">
-            @csrf
-            @method('PATCH')
-            <div class="modal-body">
-                <p class="mb-1">Anda akan mengoreksi stok untuk produk:</p>
-                <h6 class="mb-3" id="namaProdukModal">Nama Produk Akan Muncul Di Sini</h6>
-                <label for="stokValueModal" class="form-label">Masukkan Jumlah Stok Sebenarnya:</label>
-                <input type="number" name="stok" class="form-control" id="stokValueModal" min="0" required autofocus>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header bg-light border-bottom-0 rounded-top-4">
+                    <h5 class="modal-title" id="koreksiStokModalLabel">Koreksi Stok</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="modal-body">
+                        <p>Anda akan mengoreksi stok untuk produk:</p>
+                        <h6 id="namaProdukModal" class="mb-3 text-primary fw-semibold">Nama Produk</h6>
+
+                        <label for="stokValueModal" class="form-label small text-muted">Jumlah Stok Sebenarnya:</label>
+                        <input type="number" name="stok" id="stokValueModal" class="form-control form-control" min="0" required autofocus>
+                    </div>
+                    <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Koreksi</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-              <button type="submit" class="btn btn-primary">Simpan Koreksi</button>
-            </div>
-          </form>
         </div>
-      </div>
     </div>
 
     @push('scripts')
@@ -66,15 +60,9 @@
         if (koreksiStokModal) {
             koreksiStokModal.addEventListener('show.bs.modal', event => {
                 const button = event.relatedTarget;
-                const url = button.getAttribute('data-url');
-                const nama = button.getAttribute('data-nama');
-                const stok = button.getAttribute('data-stok');
-                const modalForm = koreksiStokModal.querySelector('form');
-                const modalNamaProduk = koreksiStokModal.querySelector('#namaProdukModal');
-                const modalStokInput = koreksiStokModal.querySelector('#stokValueModal');
-                modalForm.action = url;
-                modalNamaProduk.textContent = nama;
-                modalStokInput.value = stok;
+                koreksiStokModal.querySelector('form').action = button.getAttribute('data-url');
+                koreksiStokModal.querySelector('#namaProdukModal').textContent = button.getAttribute('data-nama');
+                koreksiStokModal.querySelector('#stokValueModal').value = button.getAttribute('data-stok');
             });
         }
     </script>

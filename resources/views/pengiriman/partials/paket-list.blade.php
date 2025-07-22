@@ -1,7 +1,7 @@
 {{-- resources/views/pengiriman/partials/paket-list.blade.php --}}
 
 @forelse ($pakets as $paket)
-    <div class="card mb-4 shadow rounded-4 border-0" style="background: #f6f8fa;">
+    <div class="card mb-3 shadow-sm rounded-4 border" style="background: #f6f8fa;">
         {{-- Header --}}
         <div class="card-header d-flex justify-content-between align-items-center bg-white rounded-top-4 border-bottom-0">
             <div class="fw-bold d-flex align-items-center gap-2">
@@ -13,7 +13,7 @@
                 <span>{{ optional($paket->ekspedisi)->name }}</span>
             </div>
             <span class="badge 
-                @if($paket->status == 'proses') bg-info 
+                @if($paket->status == 'proses') bg-warning
                 @elseif($paket->status == 'selesai') bg-success 
                 @elseif($paket->status == 'dibatalkan') bg-danger 
                 @else bg-secondary @endif
@@ -85,7 +85,7 @@
         </div>
         
         {{-- Footer --}}
-        <div class="card-footer bg-white rounded-bottom-4 border-top-0 d-flex justify-content-between align-items-center">
+        <div class="card-footer bg-light rounded-bottom-4 d-flex justify-content-between align-items-center">
             <small>
                 {{ $paket->created_at->format('H:i') }} | {{ optional($paket->user)->name ?? 'N/A' }}
             </small>
@@ -113,7 +113,7 @@
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="status" value="dibatalkan">
-                            <button type="submit" class="btn btn-sm btn-warning rounded-3 px-3"><i class="bi bi-x-circle fs-6"></i> Tandai Batal</button>
+                            <button type="submit" class="btn btn-sm btn-danger rounded-3 px-3"><i class="bi bi-x-circle fs-6"></i> Batalkan</button>
                         </form>
                     @endcan
                 @elseif ($paket->status == 'dibatalkan')

@@ -1,161 +1,201 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    {{-- Salam Pembuka --}}
-    <h3 class="mb-4">Selamat Datang, <span class="fw-semibold">{{ auth()->user()->name }}</span>!</h3>
+    {{-- RINGKASAN TOTAL PAKET --}}
+    <div class="d-flex gap-3 mb-4 flex-wrap">
+        <div class="flex-grow-1">
+            <div class="dashboard-card card text-center shadow border-0 rounded-4 bg-white h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Perlu Diproses</h6>
+                    <h2 class="fw-bold text-warning">{{ $data['jumlah_proses'] }}</h2>
+                    <a href="{{ route('pengiriman.index', ['status' => 'proses']) }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
 
-    {{-- BARIS 1: RINGKASAN TOTAL PAKET --}}
-    <div class="row g-4 mb-4">
-        <div class="col-lg-4 col-md-6">
-            <div class="card text-center shadow-sm h-100">
+        <div class="flex-grow-1">
+            <div class="dashboard-card card text-center shadow border-0 rounded-4 bg-white h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Perlu Diproses (Total)</h6>
-                    <h2 class="card-title text-warning fw-bold">{{ $data['jumlah_proses'] }}</h2>
+                    <h6 class="text-muted">Selesai</h6>
+                    <h2 class="fw-bold text-success">{{ $data['jumlah_selesai'] }}</h2>
+                    <a href="{{ route('pengiriman.index', ['status' => 'selesai']) }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6">
-            <div class="card text-center shadow-sm h-100">
+
+        <div class="flex-grow-1">
+            <div class="dashboard-card card text-center shadow border-0 rounded-4 bg-white h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Selesai (Total)</h6>
-                    <h2 class="card-title text-success fw-bold">{{ $data['jumlah_selesai'] }}</h2>
+                    <h6 class="text-muted">Dibatalkan</h6>
+                    <h2 class="fw-bold text-danger">{{ $data['jumlah_dibatalkan'] }}</h2>
+                    <a href="{{ route('pengiriman.index', ['status' => 'dibatalkan']) }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6">
-            <div class="card text-center shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Dibatalkan (Total)</h6>
-                    <h2 class="card-title text-danger fw-bold">{{ $data['jumlah_dibatalkan'] }}</h2>
+
+        @can('create-shipments')
+        <div class="flex-grow-1">
+            <a href="{{ route('pengiriman.pratinjau') }}" class="text-decoration-none">
+                <div class="dashboard-card card text-center shadow border-0 rounded-4 bg-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">Di Pratinjau</h6>
+                        <h2 class="fw-bolder text-info">{{ $data['jumlah_pratinjau'] }}</h2>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        @endcan
     </div>
 
-    <hr class="my-4">
 
-    {{-- Kartu Stok Rendah --}}
-    <div class="row mb-4">
-        <div class="col-lg-12 col-md-10 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-box-seam me-2"></i>Produk Stok Rendah
-                    </h5>
-                    <small class="text-muted">Stok di bawah atau sama dengan batas minimal.</small>
-                </div>
-                <div class="card-body">
-                    @if(isset($data['produk_stok_rendah']))
-                        @forelse ($data['produk_stok_rendah'] as $produk)
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <span class="fw-semibold">{{ $produk->nama }}</span>
-                                    <small class="text-muted d-block">{{ optional($produk->toko)->name }}</small>
-                                </div>
-                                <span class="badge bg-danger rounded-pill px-3 py-2">
-                                    {{ $produk->stok }}
-                                    <small class="fw-normal">/ {{ $produk->minimal_stok }}</small>
-                                </span>
-                            </div>
-                        @empty
-                            <p class="text-muted text-center my-2">✓ Semua stok aman!</p>
-                        @endforelse
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- BARIS 2: KONTEN UTAMA DENGAN DUA KOLOM --}}
-    @can('is-super-admin')
-        <div class="mb-4 p-3 rounded shadow-sm bg-secondary bg-opacity-10">
-            <form method="GET" action="{{ route('dashboard') }}" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label for="tanggal_mulai" class="form-label fw-semibold">Periode Mulai</label>
-                <input type="date" class="form-control" name="tanggal_mulai" id="tanggal_mulai" value="{{ request('tanggal_mulai', now()->subDays(6)->toDateString()) }}">
+    {{-- PRODUK STOK RENDAH --}}
+    <div class="card shadow border-0 rounded-4 mb-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Produk Stok Rendah</h5>
+                <small class="text-muted">Stok di bawah batas minimal.</small>
             </div>
-            <div class="col-md-1 d-flex align-items-center justify-content-center pt-3">
-                <span class="fw-bold">s/d</span>
-            </div>
-            <div class="col-md-4">
-                <label for="tanggal_selesai" class="form-label fw-semibold">Periode Selesai</label>
-                <input type="date" class="form-control" name="tanggal_selesai" id="tanggal_selesai" value="{{ request('tanggal_selesai', now()->toDateString()) }}">
-            </div>
-            <div class="col-md-3 pt-2">
-                <button type="submit" class="btn btn-primary w-100 fw-semibold">
-                Terapkan
+            
+            {{-- TOMBOL SORTING BARU --}}
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-sort-down me-2"></i> Urutkan
                 </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item {{ ($data['current_sort'] ?? 'stok_asc') == 'stok_asc' ? 'active' : '' }}" href="{{ route('dashboard', ['sort' => 'stok_asc']) }}">Paling Sedikit</a></li>
+                    <li><a class="dropdown-item {{ ($data['current_sort'] ?? '') == 'jenis_produk' ? 'active' : '' }}" href="{{ route('dashboard', ['sort' => 'jenis_produk']) }}">Berdasarkan Jenis</a></li>
+                    <li><a class="dropdown-item {{ ($data['current_sort'] ?? '') == 'toko' ? 'active' : '' }}" href="{{ route('dashboard', ['sort' => 'toko']) }}">Berdasarkan Toko</a></li>
+                </ul>
             </div>
+        </div>
+        <div class="card-body rounded-4 p-1">
+            {{-- Logika untuk menampilkan 5 item dan collapse (tidak berubah) --}}
+            @if(isset($data['produk_stok_rendah']) && $data['produk_stok_rendah']->isNotEmpty())
+                <ul class="list-group list-group-flush">
+                    @foreach ($data['produk_stok_rendah'] as $produk)
+                        @if ($loop->iteration == 6)
+                            <div class="collapse" id="lihatStokRendahLainnya">
+                        @endif
+
+                        <a href="{{ route('stok.show_by_jenis', [
+                            'jenisProduk' => $produk->jenis_produk_id, 
+                            'active_kategori' => optional(optional($produk->jenisProduk)->kategoris)->first()->id ?? ''
+                            ]) }}" 
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="d-block fw-semibold">{{ $produk->nama }}</span>
+                                <small class="text-muted">{{ optional($produk->toko)->name }} &middot; {{ optional($produk->jenisProduk)->name }}</small>
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill fs-6">
+                                {{ $produk->stok }} / <small>{{ $produk->minimal_stok }}</small>
+                            </span>
+                        </a>
+                    @endforeach
+                    
+                    @if($data['produk_stok_rendah']->count() > 5)
+                        </div>
+                    @endif
+                </ul>
+            @else
+                <div class="text-center text-muted p-4">
+                    <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+                    <p class="mb-0 mt-2">Semua stok aman!</p>
+                </div>
+            @endif
+        </div>
+
+        {{-- Tombol 'Lihat Semua' (tidak berubah) --}}
+        @if(isset($data['produk_stok_rendah']) && $data['produk_stok_rendah']->count() > 5)
+            <div class="card-footer bg-transparent text-center">
+                <a class="btn btn-sm btn-link text-decoration-none p-0 collapse-trigger" 
+                data-bs-toggle="collapse" 
+                href="#lihatStokRendahLainnya" 
+                role="button" 
+                aria-expanded="false">
+                    <span class="collapse-text">Lihat {{ $data['produk_stok_rendah']->count() - 5 }} item lainnya</span>
+                    <i class="bi bi-chevron-down small collapse-icon"></i>
+                </a>
+            </div>
+        @endif
+    </div>
+
+    @can('is-super-admin')
+    {{-- FILTER PERIODE --}}
+    <div class="card shadow border-0 rounded-4 mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('dashboard') }}" class="d-flex flex-wrap align-items-end gap-2">
+                <div style="flex:1; min-width: 150px;">
+                    <label class="form-label fw-semibold">Periode Mulai</label>
+                    <input type="date" name="tanggal_mulai" class="form-control" value="{{ request('tanggal_mulai', now()->subDays(6)->toDateString()) }}">
+                </div>
+                <div class="d-flex align-items-center justify-content-center fw-bold" style="min-width: 40px;">
+                    s/d
+                </div>
+                <div style="flex:1; min-width: 150px;">
+                    <label class="form-label fw-semibold">Periode Selesai</label>
+                    <input type="date" name="tanggal_selesai" class="form-control" value="{{ request('tanggal_selesai', now()->toDateString()) }}">
+                </div>
+                <div style="min-width: 120px;">
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold mt-3 mt-md-0">Terapkan</button>
+                </div>
             </form>
         </div>
-        <div class="row g-4">
-            {{-- KOLOM KIRI: GRAFIK-GRAFIK UTAMA --}}
-            <div class="col-lg-8">
-                {{-- Grafik Penjualan 7 Hari --}}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Item Terjual (7 Hari Terakhir)
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="salesChart" style="max-height: 320px;"></canvas>
-                    </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 rounded-4 mb-4">
+                <div class="card-header rounded-top-4 bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Item Terjual (7 Hari Terakhir)</h5>
                 </div>
-                {{-- Grafik Stok Masuk vs Keluar --}}
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-arrow-down-up me-2"></i>Stok Masuk vs Keluar (7 Hari Terakhir)
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="stockMovementChart" style="max-height: 320px;"></canvas>
-                    </div>
+                <div class="card-body">
+                    <canvas id="salesChart" style="max-height: 320px;"></canvas>
                 </div>
             </div>
 
-            {{-- KOLOM KANAN: KARTU-KARTU INFORMASI --}}
-            <div class="col-lg-4">
-                {{-- Ringkasan Penjualan --}}
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-calculator-fill me-2"></i>Ringkasan Penjualan
-                        </h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="row">
-                            <div class="col-6 border-end">
-                                <h6 class="card-subtitle mb-2 text-muted">Hari Ini</h6>
-                                <h4 class="card-title text-primary fw-bold">{{ $data['penjualan_hari_ini'] }}</h4>
-                            </div>
-                            <div class="col-6">
-                                <h6 class="card-subtitle mb-2 text-muted">Bulan Ini</h6>
-                                <h4 class="card-title text-primary fw-bold">{{ $data['penjualan_bulan_ini'] }}</h4>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header rounded-top-4 bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Stok Masuk vs Keluar</h5>
                 </div>
-
-                {{-- Penjualan per Merchant --}}
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-pie-chart-fill me-2"></i>Penjualan per Merchant
-                        </h5>
-                    </div>
-                    <div class="card-body d-flex justify-content-center align-items-center">
-                        <div style="position: relative; height:250px; width:250px">
-                            <canvas id="merchantPieChart"></canvas>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <canvas id="stockMovementChart" style="max-height: 320px;"></canvas>
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow border-0 rounded-4 mb-4">
+                <div class="card-header rounded-top-4 bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-cash-coin me-2"></i>Ringkasan Penjualan</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-6 border-end">
+                            <h6 class="text-muted">Hari Ini</h6>
+                            <h4 class="fw-bold text-primary">{{ $data['penjualan_hari_ini'] }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Bulan Ini</h6>
+                            <h4 class="fw-bold text-primary">{{ $data['penjualan_bulan_ini'] }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header rounded-top-4 bg-white border-bottom">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Penjualan per Merchant</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="merchantPieChart" style="max-height: 250px; max-width: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
     @endcan
 
-    {{-- Jembatan Data untuk JavaScript --}}
+    {{-- DATA UNTUK CHART JS --}}
     <div id="page-data"
          data-sales-chart-labels='@json($data['chartLabels'] ?? [])'
          data-sales-chart-values='@json($data['chartData'] ?? [])'
@@ -164,6 +204,20 @@
          data-stock-chart-keluar='@json($data['stockKeluarData'] ?? [])'
          data-merchant-chart-labels='@json($data['merchantLabels'] ?? [])'
          data-merchant-chart-data='@json($data['merchantData'] ?? [])'
-         style="display: none;">
+         hidden>
     </div>
+
+        {{-- CSS Kustom untuk efek hover --}}
+    @push('styles')
+    <style>
+        .dashboard-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
+    </style>
+    @endpush
+
 </x-layout>

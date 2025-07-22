@@ -158,6 +158,8 @@ body {
     padding: 0.5rem 12px 0.25rem 12px;
 }
 
+
+
 /* Aturan untuk layar kecil (mobile) */
 @media (max-width: 768px) {
      .sidebar {
@@ -211,6 +213,16 @@ input[type=number].no-spinner::-webkit-inner-spin-button {
 
 input[type=number].no-spinner {
      appearance: textfield; /* Firefox */
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    appearance: textfield; /* Firefox */
 }
 
 .status-proses {

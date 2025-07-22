@@ -1,10 +1,10 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container py-4">
+    <div class="container py-1>
         <div class="row justify-content-center">
-            <div class="col-md-9 col-lg-8">
-                <div class="card">
+            <div class="col-md-12 col-lg-12">
+                <div class="card border-0 shadow rounded-4">
                     <div class="card-body p-4">
                         {{-- Form utama kita --}}
                         <form action="{{ route('stok-adj.store') }}" method="POST" id="stokAdjustmentForm">
@@ -62,13 +62,13 @@
                                     <label for="jumlah" class="form-label fw-bold">5. Masukkan Jumlah</label>
                                     <input type="number" class="form-control" id="jumlah" name="jumlah" placeholder="Hanya angka positif" required min="1">
                                 </div>
-                                <div class="col-sm-6 mb-3 d-flex gap-2">
+                                <div class="col-sm-6 mb-3 d-flex gap-2 align-items-center">
                                     {{-- Tombol Aksi --}}
-                                    <button type="submit" class="btn btn-warning w-100 btn-aksi" data-action="keluar">
-                                        <i class="bi bi-dash-lg"></i> Kurangi dari Stok
+                                    <button type="submit" class="btn btn-warning w-100 btn-aksi d-flex align-items-center justify-content-center gap-2" data-action="keluar">
+                                        <i class="bi bi-dash-lg"></i> <span>Kurangi dari Stok</span>
                                     </button>
-                                    <button type="submit" class="btn btn-success w-100 btn-aksi" data-action="masuk">
-                                        <i class="bi bi-plus-lg"></i> Tambah ke Stok
+                                    <button type="submit" class="btn btn-success w-100 btn-aksi d-flex align-items-center justify-content-center gap-2" data-action="masuk">
+                                        <i class="bi bi-plus-lg"></i> <span>Tambah ke Stok</span>
                                     </button>
                                 </div>
                             </div>

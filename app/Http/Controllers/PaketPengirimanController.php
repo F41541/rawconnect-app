@@ -65,11 +65,33 @@ class PaketPengirimanController extends Controller
         $data['jumlah_proses'] = PaketPengiriman::where('status', 'proses')->count();
         $data['jumlah_selesai'] = PaketPengiriman::where('status', 'selesai')->count();
         $data['jumlah_dibatalkan'] = PaketPengiriman::where('status', 'dibatalkan')->count();
-        $data['produk_stok_rendah'] = Produk::whereRaw('stok <= minimal_stok')
-                                ->where('stok', '>', 0)
-                                ->orderBy('stok', 'asc')
-                                ->limit(5)
-                                ->get();
+        $data['jumlah_pratinjau'] = PratinjauItem::where('user_id', auth()->id())->count();
+        $sort = $request->input('sort', 'stok_asc'); // Default sort: stok paling sedikit
+
+        $query = Produk::with(['toko', 'jenisProduk.kategoris'])
+            ->whereRaw('stok < minimal_stok')
+            ->where('stok', '>', 0);
+
+        switch ($sort) {
+            case 'jenis_produk':
+                $query->join('jenis_produks', 'produks.jenis_produk_id', '=', 'jenis_produks.id')
+                    ->orderBy('jenis_produks.name', 'asc')
+                    ->orderBy('produks.stok', 'asc')
+                    ->select('produks.*');
+                break;
+            case 'toko':
+                $query->join('tokos', 'produks.toko_id', '=', 'tokos.id')
+                    ->orderBy('tokos.name', 'asc')
+                    ->orderBy('produks.stok', 'asc')
+                    ->select('produks.*');
+                break;
+            default: // stok_asc
+                $query->orderBy('stok', 'asc');
+                break;
+        }
+
+        $data['produk_stok_rendah'] = $query->get();
+        $data['current_sort'] = $sort; // Kirim info sort ke view
 
         // --- Data Widget Penjualan (untuk Super Admin) ---
         if ($user->can('is-super-admin')) {

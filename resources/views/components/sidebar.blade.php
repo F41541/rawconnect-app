@@ -17,7 +17,7 @@
         {{-- ======================================================= --}}
         {{-- == MENU OPERASIONAL (PEGAWAI, ADMIN, SUPER ADMIN) == --}}
         {{-- ======================================================= --}}
-        <li class="nav-item mt-3">
+        <li class="nav-item">
             <h6 class="sidebar-heading text-muted">OPERASIONAL</h6>
         </li>
 
@@ -48,7 +48,7 @@
         {{-- ============================================== --}}
         {{-- == LIHAT STOK (UNTUK SEMUA PERAN) == --}}
         {{-- ============================================== --}}
-        <li class="nav-item mt-3">
+        <li class="nav-item">
             <h6 class="sidebar-heading text-muted">LIHAT STOK</h6>
         </li>
         @if(isset($sidebarKategoris))
@@ -98,7 +98,7 @@
         {{-- == PANEL SUPER ADMIN (HANYA SUPER ADMIN) === --}}
         {{-- ============================================== --}}
         @can('is-super-admin')
-            <li class="nav-item mt-3">
+            <li class="nav-item">
                 <h6 class="sidebar-heading text-muted">PANEL SUPER ADMIN</h6>
             </li>
             <li class="nav-item">
@@ -135,8 +135,8 @@
 
 
         {{-- BAGIAN AKUN DI PALING BAWAH (UNTUK SEMUA) --}}
-        <li class="nav-item mt-auto"> 
-            <hr class="mx-2">
+        <li class="nav-item"> 
+            <h6 class="sidebar-heading">
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}" href="{{ route('profile.edit') }}">

@@ -2,9 +2,6 @@
     <x-slot:title>{{ $title }}</x-slot:title>
 
     <div class="card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Laporan Penjualan</h5>
-        </div>
         <div class="card-body">
             {{-- Form Filter Tanggal --}}
             <form method="GET" action="{{ route('superadmin.laporan.penjualan') }}" class="row g-3 mb-4 align-items-end">
