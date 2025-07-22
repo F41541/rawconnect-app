@@ -78,11 +78,17 @@
                             <div class="collapse" id="lihatStokRendahLainnya">
                         @endif
 
+                        @php
+                            // Ambil relasi jenisProduk dengan aman
+                            $jenisProduk = $produk->jenisProduk;
+                            // Ambil kategori pertama dari jenis produk tersebut, jika ada
+                            $kategoriPertama = $jenisProduk ? $jenisProduk->kategoris->first() : null;
+                        @endphp
                         <a href="{{ route('stok.show_by_jenis', [
-                            'jenisProduk' => $produk->jenis_produk_id, 
-                            'active_kategori' => optional(optional($produk->jenisProduk)->kategoris)->first()->id ?? ''
-                            ]) }}" 
-                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            'jenisProduk' => $produk->jenis_produk_id,
+                            'active_kategori' => $kategoriPertama ? $kategoriPertama->id : ''
+                            ]) }}"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <span class="d-block fw-semibold">{{ $produk->nama }}</span>
                                 <small class="text-muted">{{ optional($produk->toko)->name }} &middot; {{ optional($produk->jenisProduk)->name }}</small>

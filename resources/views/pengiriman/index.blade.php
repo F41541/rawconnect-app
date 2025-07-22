@@ -15,28 +15,22 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active px-3 py-2 d-flex align-items-center justify-content-between text-nowrap w-100" 
                     id="proses-tab" data-bs-toggle="tab" data-bs-target="#proses" type="button" role="tab">
-                    <span class="d-flex align-items-center gap-2">
-                        <i class="bi bi-hourglass-split text-warning"></i> Perlu Diproses
-                    </span>
-                    <span class="badge bg-warning text-dark fs-6">{{ $paket_proses->count() }}</span>
+                    <span class="d-flex align-items-center gap-2">Perlu Diproses</span>
+                    <span class="badge bg-warning text-dark fs-6">{{ $paket_proses->total() }}</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link px-3 py-2 d-flex align-items-center justify-content-between text-nowrap w-100" 
                     id="selesai-tab" data-bs-toggle="tab" data-bs-target="#selesai" type="button" role="tab">
-                    <span class="d-flex align-items-center gap-2">
-                        <i class="bi bi-check-circle-fill text-success"></i> Selesai
-                    </span>
-                    <span class="badge bg-success fs-6">{{ $paket_selesai->count() }}</span>
+                    <span class="d-flex align-items-center gap-2">Selesai</span>
+                    <span class="badge bg-success fs-6">{{ $paket_selesai->total() }}</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link px-3 py-2 d-flex align-items-center justify-content-between text-nowrap w-100" 
                     id="dibatalkan-tab" data-bs-toggle="tab" data-bs-target="#dibatalkan" type="button" role="tab">
-                    <span class="d-flex align-items-center gap-2">
-                        <i class="bi bi-x-circle-fill text-danger"></i> Dibatalkan
-                    </span>
-                    <span class="badge bg-danger fs-6">{{ $paket_dibatalkan->count() }}</span>
+                    <span class="d-flex align-items-center gap-2">Dibatalkan</span>
+                    <span class="badge bg-danger fs-6">{{ $paket_dibatalkan->total() }}</span>
                 </button>
             </li>
         </ul>

@@ -23,10 +23,10 @@ class LaporanController extends Controller
 
         // Terapkan filter tanggal jika ada
         if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('created_at', '>=', $request->tanggal_mulai);
+            $query->whereDate('created_at', '>=', $request->input('tanggal_mulai'));
         }
         if ($request->filled('tanggal_selesai')) {
-            $query->whereDate('created_at', '<=', $request->tanggal_selesai);
+            $query->whereDate('created_at', '<=', $request->input('tanggal_selesai'));
         }
 
         $laporanPenjualan = $query->paginate(20); // Paginasi agar tidak berat

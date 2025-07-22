@@ -5,6 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $status
+ * @property int $toko_id
+ * @property int $merchant_id
+ * @property int $ekspedisi_id
+ * @property int $kategoris
+ * @property int|null $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\Toko|null $toko
+ * @property-read \App\Models\Merchant|null $merchant
+ * @property-read \App\Models\Ekspedisi|null $ekspedisi
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ItemPaket[] $items
+ */
+
 class PaketPengiriman extends Model
 {
     use HasFactory;

@@ -58,7 +58,7 @@ class JenisProdukController extends Controller
     
         // Jika tidak ada kategori yang dipilih, $request->kategoris akan null
         // Method sync() akan otomatis menangani ini dengan menghapus semua relasi jika inputnya kosong/null
-        $jenisProduk->kategoris()->sync($request->kategoris);
+        $jenisProduk->kategoris()->sync($request->input('kategoris'));
 
         return redirect()->back()->with('success', 'Jenis Produk baru berhasil ditambahkan!');
     }
@@ -88,7 +88,7 @@ class JenisProdukController extends Controller
 
         $jenisProduk->update(['name' => $validatedData['name']]);
         
-        $jenisProduk->kategoris()->sync($request->kategoris);
+        $jenisProduk->kategoris()->sync($request->input('kategoris'));
 
         return redirect(session('index_return_url', route('superadmin.jenis-produk.index')))
                    ->with('success', 'Jenis Produk berhasil diperbarui!');

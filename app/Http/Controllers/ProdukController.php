@@ -52,7 +52,7 @@ class ProdukController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nama'              => ['required', 'string', 'max:255', Rule::unique('produks')->where(fn ($query) => $query->where('jenis_produk_id', $request->jenis_produk_id))],
+            'nama'              => ['required', 'string', 'max:255', Rule::unique('produks')->where(fn ($query) => $query->where('jenis_produk_id', $request->input('jenis_produk_id')))],
             'jenis_produk_id'   => 'required|exists:jenis_produks,id',
             'toko_id'           => 'required|exists:tokos,id',
             'stok'              => 'required|integer|min:0',
@@ -92,7 +92,7 @@ class ProdukController extends Controller
     public function update(Request $request, Produk $produk)
     {
         $validatedData = $request->validate([
-            'nama' => ['required', 'string', 'max:255', Rule::unique('produks')->where(fn ($query) => $query->where('jenis_produk_id', $request->jenis_produk_id))->ignore($produk->id)],
+            'nama' => ['required', 'string', 'max:255', Rule::unique('produks')->where(fn ($query) => $query->where('jenis_produk_id', $request->input('jenis_produk_id')))->ignore($produk->id)],
             'jenis_produk_id'   => 'required|exists:jenis_produks,id',
             'toko_id'           => 'required|exists:tokos,id',
             'stok'              => 'required|integer|min:0',

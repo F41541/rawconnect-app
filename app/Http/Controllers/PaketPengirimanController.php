@@ -33,17 +33,17 @@ class PaketPengirimanController extends Controller
         $paket_proses = PaketPengiriman::where('status', 'proses')
                                        ->with($relations)
                                        ->latest()
-                                       ->paginate(10, ['*'], 'prosesPage');
+                                       ->paginate(1, ['*'], 'prosesPage');
 
         $paket_selesai = PaketPengiriman::where('status', 'selesai')
                                       ->with($relations)
                                       ->latest()
-                                      ->paginate(10, ['*'], 'selesaiPage');
+                                      ->paginate(1, ['*'], 'selesaiPage');
 
         $paket_dibatalkan = PaketPengiriman::where('status', 'dibatalkan')
                                          ->with($relations)
                                          ->latest()
-                                         ->paginate(10, ['*'], 'dibatalkanPage');
+                                         ->paginate(1, ['*'], 'dibatalkanPage');
 
         return view('pengiriman.index', [
             'title' => 'Daftar Pengiriman',
@@ -195,7 +195,7 @@ class PaketPengirimanController extends Controller
     public function getMerchantsByToko(Request $request)
     {
         $request->validate(['toko_id' => 'required|exists:tokos,id']);
-        $merchantIds = LayananPengiriman::where('toko_id', $request->toko_id)->pluck('merchant_id')->unique();
+        $merchantIds = LayananPengiriman::where('toko_id', $request->input('toko_id'))->pluck('merchant_id')->unique();
         $merchants = Merchant::whereIn('id', $merchantIds)->orderBy('name')->get();
         return response()->json($merchants);
     }
@@ -203,8 +203,8 @@ class PaketPengirimanController extends Controller
     public function getEkspedisisByToko(Request $request)
     {
         $request->validate(['toko_id' => 'required|exists:tokos,id', 'merchant_id' => 'required|exists:merchants,id']);
-        $ekspedisiIds = LayananPengiriman::where('toko_id', $request->toko_id)
-            ->where('merchant_id', $request->merchant_id)
+        $ekspedisiIds = LayananPengiriman::where('toko_id', $request->input('toko_id'))
+            ->where('merchant_id', $request->input('merchant_id'))
             ->pluck('ekspedisi_id')->unique();
         $ekspedisis = Ekspedisi::whereIn('id', $ekspedisiIds)->orderBy('name')->get();
         return response()->json($ekspedisis);
@@ -218,9 +218,9 @@ class PaketPengirimanController extends Controller
             'q' => 'required|string',
         ]);
         $produks = Produk::query()
-            ->where('toko_id', $request->toko_id)
-            ->where('jenis_produk_id', $request->jenis_produk_id)
-            ->where('nama', 'LIKE', "%{$request->q}%")
+            ->where('toko_id', $request->input('toko_id'))
+            ->where('jenis_produk_id', $request->input('jenis_produk_id'))
+            ->where('nama', 'LIKE', "%{$request->input('q')}%")
             ->select('id', 'nama as text', 'satuan')->limit(10)->get();
         return response()->json($produks);
     }
@@ -313,8 +313,10 @@ class PaketPengirimanController extends Controller
         ->oldest()
         ->get();
             
-        // FIX: Urutkan berdasarkan nama produk A-Z
-        $sortedItems = $pratinjauItems->sortBy(fn($item) => optional($item->produk)->nama);
+        $validItems = $pratinjauItems->filter(fn($item) => $item->produk !== null);
+
+        // Urutkan berdasarkan nama produk A-Z
+        $sortedItems = $validItems->sortBy(fn($item) => $item->produk->nama);
         $groupedItems = $sortedItems->groupBy(fn($item) => $item->toko_id . '-' . $item->merchant_id . '-' . $item->ekspedisi_id);
         
         return view('pengiriman.pratinjau', [
@@ -343,14 +345,20 @@ class PaketPengirimanController extends Controller
         // Langkah 2: Pengecekan Stok dengan jumlah TERBARU dari layar
         foreach ($pratinjauItems as $item) {
             // Jika item tidak ditemukan di map, lewati (sebagai pengaman)
+            if (!$item->produk) {
+                // Batalkan transaksi jika ada produk yang tidak valid di keranjang
+                DB::rollBack();
+                return redirect()->route('pengiriman.pratinjau')->with('error', 'Proses dibatalkan! Salah satu item di pratinjau tidak memiliki produk yang valid.');
+            }
+
             if (!isset($jumlahMap[$item->id])) continue;
 
             $jumlahBaru = $jumlahMap[$item->id]['jumlah'];
             $stokDiminta = ($item->berat_per_item > 0) ? $item->berat_per_item * $jumlahBaru : $jumlahBaru;
             
-            if (optional($item->produk)->stok < $stokDiminta) {
+            if ($item->produk->stok < $stokDiminta) {
                 return redirect()->route('pengiriman.pratinjau')
-                    ->with('error', 'Proses dibatalkan! Stok untuk "'. optional($item->produk)->nama .'" tidak mencukupi.');
+                    ->with('error', 'Proses dibatalkan! Stok untuk "'. $item->produk->nama .'" tidak mencukupi.');
             }
         }
 
@@ -375,7 +383,7 @@ class PaketPengirimanController extends Controller
                     
                     $paket->items()->create([
                         'produk_id'        => $item->produk_id,
-                        'jumlah'           => $jumlahBaru, // <-- Menggunakan jumlah baru
+                        'jumlah'           => $jumlahBaru,
                         'berat_per_item'   => $item->berat_per_item,
                         'deskripsi_varian' => $item->deskripsi_varian,
                     ]);
@@ -407,9 +415,14 @@ class PaketPengirimanController extends Controller
         try {
             if ($newStatus === 'selesai' && $oldStatus !== 'selesai') {
                 foreach ($paketPengiriman->items as $item) {
+                    // PERBAIKAN: Tambahkan pengecekan ini
+                    if (!$item->produk) {
+                        throw new \Exception('Gagal menyelesaikan paket karena salah satu produknya telah dihapus.');
+                    }
+                    
                     $jumlahPengurang = ($item->berat_per_item > 0) ? $item->berat_per_item * $item->jumlah : $item->jumlah;
-                    if(optional($item->produk)->stok < $jumlahPengurang) {
-                        throw new \Exception('Stok untuk produk "'. optional($item->produk)->nama .'" tidak mencukupi saat akan diselesaikan.');
+                    if($item->produk->stok < $jumlahPengurang) {
+                        throw new \Exception('Stok untuk produk "'. $item->produk->nama .'" tidak mencukupi saat akan diselesaikan.');
                     }
                     $item->produk->recordStockChange(-$jumlahPengurang, 'penjualan', 'Paket ID: ' . $paketPengiriman->id);
                     $item->produk()->lockForUpdate()->decrement('stok', $jumlahPengurang);
