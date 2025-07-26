@@ -1,7 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container py-3">
+    <div class="container py-1">
         <div class="card shadow-sm rounded-4 border">
             <div class="card-body">
                 <form method="GET" action="{{ route('log.stok') }}" class="row g-3 align-items-end">
@@ -33,6 +33,7 @@
                             <tr>
                                 <th>Waktu</th>
                                 <th>Produk</th>
+                                <th>Satuan</th>
                                 <th>Tipe</th>
                                 <th class="text-end">Perubahan</th>
                                 <th class="text-end">Stok Awal</th>
@@ -46,6 +47,7 @@
                                 <tr>
                                     <td>{{ $log->created_at->format('d M Y, H:i') }}</td>
                                     <td>{{ optional($log->produk)->nama ?? '-' }}</td>
+                                    <td>{{ optional($log->produk)->satuan ?? '-' }}</td>   
                                     <td>
                                         <span class="badge bg-{{ $log->tipe === 'masuk' ? 'success' : 'warning' }}-subtle text-{{ $log->tipe === 'masuk' ? 'success' : 'warning' }}-emphasis">
                                             {{ ucfirst($log->tipe) }}
@@ -54,8 +56,8 @@
                                     <td class="text-end fw-bold {{ $log->jumlah_berubah > 0 ? 'text-success' : 'text-danger' }}">
                                         {{ $log->jumlah_berubah > 0 ? '+' : '' }}{{ $log->jumlah_berubah }}
                                     </td>
-                                    <td class="text-end">{{ $log->stok_sebelum }}</td>
-                                    <td class="text-end">{{ $log->stok_sesudah }}</td>
+                                    <td class="text-end">{{ number_format($log->stok_sebelum, 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($log->stok_sesudah, 0, ',', '.') }}</td>
                                     <td>{{ optional($log->user)->name ?? 'Sistem' }}</td>
                                     <td>{{ $log->keterangan ?? '-' }}</td>
                                 </tr>

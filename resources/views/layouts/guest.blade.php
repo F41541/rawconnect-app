@@ -32,7 +32,7 @@
     <body>
         <div class="auth-card">
             {{-- Kartu untuk membungkus SEMUANYA, logo dan form --}}
-            <div class="card shadow-sm border-0">
+            <div class="card shadow border-0 rounded-4">
                 {{-- Logo diletakkan di dalam card-header agar rapi --}}
                 <div class="card-header bg-transparent text-center border-0 pt-4">
                      <a href="/">

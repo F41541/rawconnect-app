@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\SuperAdmin; // <-- Pastikan namespace-nya benar
+namespace App\Http\Controllers\SuperAdmin; 
 
-use App\Http\Controllers\Controller; // <-- Tambahkan ini
+use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
 use App\Models\StockLog;
 
@@ -10,18 +10,15 @@ class LaporanController extends Controller
 {
     public function penjualan(Request $request)
     {
-        // Validasi input filter tanggal (opsional)
         $request->validate([
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
 
-        // Ambil data log stok dengan tipe 'penjualan'
         $query = StockLog::where('tipe', 'penjualan')
-                         ->with(['produk', 'user']) // Ambil juga data relasinya
-                         ->latest(); // Urutkan dari yang terbaru
+                         ->with(['produk', 'user'])
+                         ->latest();
 
-        // Terapkan filter tanggal jika ada
         if ($request->filled('tanggal_mulai')) {
             $query->whereDate('created_at', '>=', $request->input('tanggal_mulai'));
         }
@@ -29,10 +26,10 @@ class LaporanController extends Controller
             $query->whereDate('created_at', '<=', $request->input('tanggal_selesai'));
         }
 
-        $laporanPenjualan = $query->paginate(20); // Paginasi agar tidak berat
+        $laporanPenjualan = $query->paginate(20); 
 
         return view('superadmin.laporan.penjualan', [
-            'title' => 'Laporan Penjualan',
+            'title' => 'LAPORAN PENJUALAN',
             'laporan' => $laporanPenjualan,
         ]);
     }

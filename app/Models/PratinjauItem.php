@@ -22,11 +22,8 @@ class PratinjauItem extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel secara manual karena nama model
-    // 'PratinjauItem' tidak otomatis menjadi 'pratinjau_items' oleh Laravel.
     protected $table = 'pratinjau_items';
 
-    // Daftar kolom yang boleh diisi secara massal
     protected $fillable = [
         'produk_id',
         'jumlah',
@@ -38,8 +35,6 @@ class PratinjauItem extends Model
         'user_id',
     ];
 
-    // --- Definisi Relasi ---
-    // Ini akan sangat membantu kita nanti saat menampilkan data di halaman pratinjau
 
     public function produk()
     {

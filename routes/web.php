@@ -16,6 +16,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SuperAdmin\LaporanController;
 use App\Http\Controllers\SuperAdmin\MasterController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\DashboardController;
 
 
 // Rute Autentikasi dari Breeze
@@ -31,7 +32,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- GRUP 1: Rute untuk SEMUA PERAN (Pegawai, Admin, Super Admin) ---
-    Route::get('/dashboard', [PaketPengirimanController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Melihat daftar pengiriman dan stok bisa dilakukan semua peran

@@ -26,10 +26,8 @@ class PaketPengiriman extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel secara manual karena nama model kita tidak jamak
     protected $table = 'paket_pengiriman';
 
-    // Daftar kolom yang boleh diisi secara massal
     protected $fillable = [
         'toko_id',
         'merchant_id',
@@ -38,7 +36,6 @@ class PaketPengiriman extends Model
         'user_id',
     ];
 
-    // --- DEFINISI RELASI ---
 
     /**
      * Relasi ke Toko: Satu paket ini milik satu Toko.

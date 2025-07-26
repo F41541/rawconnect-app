@@ -1,11 +1,11 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container">
+    <div class="container py-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
             @can('is-super-admin')
-                <a href="{{ route('superadmin.produk.index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i> Kembali
+                <a href="{{ route('superadmin.master.index') }}" class="btn btn-light border shadow-sm d-flex align-items-center gap-2" title="Kembali">
+                    <i class="bi bi-arrow-left">Kembali</i>
                 </a>
             @endcan
 

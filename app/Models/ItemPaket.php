@@ -33,8 +33,6 @@ class ItemPaket extends Model
         'deskripsi_varian'
     ];
 
-    // --- DEFINISI RELASI ---
-
     /**
      * Relasi ke PaketPengiriman: Item ini milik satu Paket.
      */

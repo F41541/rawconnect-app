@@ -21,7 +21,6 @@ class EkspedisiController extends Controller
             $sortField = 'name';
         }
 
-        // Tampilan daftar Ekspedisi tidak perlu tahu tokonya secara langsung.
         $ekspedisis = Ekspedisi::orderBy($sortField, $sortOrder)->paginate(10);
         session(['index_return_url' => request()->fullUrl()]);
 
@@ -38,9 +37,8 @@ class EkspedisiController extends Controller
      */
     public function create()
     {
-        // PENJELASAN: Tidak perlu lagi mengirim data $tokos
         return view('ekspedisi.create', [
-            'title' => 'Tambah Ekspedisi Baru',
+            'title' => 'TAMBAH EKSPEDISI BARU',
         ]);
     }
 
@@ -49,7 +47,6 @@ class EkspedisiController extends Controller
      */
     public function store(Request $request)
     {
-        // PENJELASAN: Validasi disederhanakan, tidak lagi memeriksa 'tokos'
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:ekspedisis,name',
         ]);
@@ -64,9 +61,8 @@ class EkspedisiController extends Controller
      */
     public function edit(Ekspedisi $ekspedisi)
     {
-        // PENJELASAN: Tidak perlu lagi mengirim data $tokos
         return view('ekspedisi.edit', [
-            'title' => 'Edit Ekspedisi',
+            'title' => 'EDIT EKSPEDISI',
             'ekspedisi' => $ekspedisi,
         ]);
     }
@@ -76,7 +72,6 @@ class EkspedisiController extends Controller
      */
     public function update(Request $request, Ekspedisi $ekspedisi)
     {
-        // PENJELASAN: Validasi disederhanakan, tidak lagi memeriksa 'tokos'
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('ekspedisis')->ignore($ekspedisi->id)],
         ]);
@@ -92,7 +87,6 @@ class EkspedisiController extends Controller
      */
     public function destroy(Ekspedisi $ekspedisi)
     {
-        // PENJELASAN: Menggunakan exists() yang lebih efisien dan konsisten.
         if ($ekspedisi->layananPengiriman()->exists()) {
             return redirect()->back()
                             ->with('error', 'Ekspedisi "'. $ekspedisi->name .'" tidak bisa dihapus karena masih terhubung dengan Layanan Pengiriman.');

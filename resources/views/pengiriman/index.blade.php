@@ -1,6 +1,6 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
-    <div class="container">
+    <div class="container py-1">
         {{-- Tombol Tambah (FAB) dengan Gate yang benar --}}
         @can('create-shipments')
             <a href="{{ route('pengiriman.create') }}" 
@@ -68,13 +68,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             
-            // Skrip untuk auto-open tab dari URL (sudah benar)
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
             if (status) {
                 const tabToActivate = document.querySelector('#' + status + '-tab');
                 if (tabToActivate) {
-                    // Gunakan Bootstrap 5's Tab constructor untuk mengaktifkan tab
                     const tab = new bootstrap.Tab(tabToActivate);
                     tab.show();
                 }
@@ -82,42 +80,34 @@
 
             const tabButtons = document.querySelectorAll('#pengirimanTab button[data-bs-toggle="tab"]');
             tabButtons.forEach(tabButton => {
-                // 'shown.bs.tab' adalah event dari Bootstrap yang berjalan SETELAH tab baru ditampilkan
                 tabButton.addEventListener('shown.bs.tab', event => {
-                    // Ambil status dari target (misal: '#selesai' -> 'selesai')
                     const newStatus = event.target.getAttribute('data-bs-target').substring(1);
                     
-                    // Buat objek URL baru
                     const newUrl = new URL(window.location.href);
                     newUrl.searchParams.set('status', newStatus);
 
-                    // Ganti URL di address bar tanpa reload halaman
-                    // Ini akan mengubah URL menjadi misal: /pengiriman?status=selesai
                     history.pushState({}, '', newUrl);
                 });
             });
 
-            // PERBAIKAN: Skrip untuk mengubah teks & ikon tombol 'Lihat Detail'
             const collapseTriggers = document.querySelectorAll('.collapse-trigger');
             collapseTriggers.forEach(trigger => {
                 const targetId = trigger.getAttribute('href');
                 const targetElement = document.querySelector(targetId);
                 const textElement = trigger.querySelector('.collapse-text');
-                const iconElement = trigger.querySelector('.collapse-icon'); // Tambahkan pencarian ikon
+                const iconElement = trigger.querySelector('.collapse-icon'); 
 
                 if (targetElement && textElement && iconElement) {
                     const originalText = textElement.textContent.trim();
 
-                    // Saat collapse mulai DITAMPILKAN
                     targetElement.addEventListener('show.bs.collapse', event => {
                         textElement.textContent = 'Lihat lebih sedikit';
-                        iconElement.classList.add('rotated'); // Tambahkan kelas untuk memutar
+                        iconElement.classList.add('rotated'); 
                     });
 
-                    // Saat collapse mulai DI SEMBUNYIKAN
                     targetElement.addEventListener('hide.bs.collapse', event => {
                         textElement.textContent = originalText;
-                        iconElement.classList.remove('rotated'); // Hapus kelas untuk mengembalikan
+                        iconElement.classList.remove('rotated');
                     });
                 }
             });

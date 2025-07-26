@@ -37,7 +37,7 @@ class JenisProdukController extends Controller
     public function create()
     {
         return view('jenis-produk.create', [
-            'title' => 'Tambah Jenis Produk',
+            'title' => 'TAMBAH JENIS PRODUK BARU',
             'kategoris' => Kategori::orderBy('name')->get()
         ]);
     }
@@ -47,17 +47,14 @@ class JenisProdukController extends Controller
      */
     public function store(Request $request)
     {
-        // PENJELASAN (BUG #3): Mengubah 'required' menjadi 'nullable' untuk kategori
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:jenis_produks,name',
-            'kategoris' => 'nullable|array', // Boleh kosong sekarang
+            'kategoris' => 'nullable|array', 
             'kategoris.*' => 'exists:kategoris,id'
         ]);
 
         $jenisProduk = JenisProduk::create(['name' => $validatedData['name']]);
     
-        // Jika tidak ada kategori yang dipilih, $request->kategoris akan null
-        // Method sync() akan otomatis menangani ini dengan menghapus semua relasi jika inputnya kosong/null
         $jenisProduk->kategoris()->sync($request->input('kategoris'));
 
         return redirect()->back()->with('success', 'Jenis Produk baru berhasil ditambahkan!');
@@ -69,7 +66,7 @@ class JenisProdukController extends Controller
     public function edit(JenisProduk $jenisProduk)
     {
         return view('jenis-produk.edit', [
-            'title' => 'Edit Jenis Produk',
+            'title' => 'EDIT JENIS PRODUK',
             'jenisProduk' => $jenisProduk,
             'kategoris' => Kategori::orderBy('name')->get()
         ]);
@@ -82,7 +79,7 @@ class JenisProdukController extends Controller
     {
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('jenis_produks')->ignore($jenisProduk->id)],
-            'kategoris' => 'nullable|array', // Boleh kosong sekarang
+            'kategoris' => 'nullable|array', 
             'kategoris.*' => 'exists:kategoris,id'
         ]);
 

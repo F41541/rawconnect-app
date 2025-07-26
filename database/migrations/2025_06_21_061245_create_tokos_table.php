@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::create('tokos', function (Blueprint $table) {
         $table->id();
-        $table->string('name')->unique(); // Kolom untuk nama toko, misal: 'RAW TISANE', 'TEA HOUSE'
+        $table->string('name')->unique(); 
         $table->string('logo')->nullable();
         $table->timestamps();
     });

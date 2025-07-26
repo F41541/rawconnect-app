@@ -21,8 +21,6 @@ class MerchantController extends Controller
             $sortField = 'name';
         }
 
-        // PENJELASAN: Menghapus with('tokos') karena relasinya sekarang tidak langsung.
-        // Kita hanya mengambil data merchant saja untuk halaman daftar ini.
         $merchants = Merchant::orderBy($sortField, $sortOrder)->paginate(10);
         session(['index_return_url' => request()->fullUrl()]);
         return view('merchant.index', [
@@ -38,9 +36,8 @@ class MerchantController extends Controller
      */
     public function create()
     {
-        // PENJELASAN: Tidak perlu lagi mengirim data $tokos
         return view('merchant.create', [
-            'title' => 'Tambah Merchant Baru',
+            'title' => 'TAMBAH MERCHANT BARU',
         ]);
     }
 
@@ -49,7 +46,6 @@ class MerchantController extends Controller
      */
     public function store(Request $request)
     {
-        // PENJELASAN: Validasi disederhanakan, tidak lagi memeriksa 'tokos'
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:merchants,name',
         ]);
@@ -64,9 +60,8 @@ class MerchantController extends Controller
      */
     public function edit(Merchant $merchant)
     {
-        // PENJELASAN: Tidak perlu lagi mengirim data $tokos
         return view('merchant.edit', [
-            'title' => 'Edit Merchant',
+            'title' => 'EDIT MERCHANT',
             'merchant' => $merchant,
         ]);
     }
@@ -76,7 +71,6 @@ class MerchantController extends Controller
      */
     public function update(Request $request, Merchant $merchant)
     {
-        // PENJELASAN: Validasi disederhanakan, tidak lagi memeriksa 'tokos'
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('merchants')->ignore($merchant->id)],
         ]);
@@ -92,7 +86,6 @@ class MerchantController extends Controller
      */
     public function destroy(Merchant $merchant)
     {
-        // PENJELASAN: Menggunakan exists() yang lebih efisien dan konsisten.
         if ($merchant->layananPengiriman()->exists()) {
             return redirect()->back()
                             ->with('error', 'Merchant "'. $merchant->name .'" tidak bisa dihapus karena masih terhubung dengan Layanan Pengiriman');

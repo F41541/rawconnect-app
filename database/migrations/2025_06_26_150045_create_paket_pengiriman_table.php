@@ -14,17 +14,11 @@ return new class extends Migration
         Schema::create('paket_pengiriman', function (Blueprint $table) {
             $table->id();
 
-            // PENJELASAN: Menghubungkan paket ini ke data master yang relevan
             $table->foreignId('toko_id')->constrained('tokos')->onDelete('restrict');
             $table->foreignId('merchant_id')->constrained('merchants')->onDelete('restrict');
             $table->foreignId('ekspedisi_id')->constrained('ekspedisis')->onDelete('restrict');
-
-            // PENJELASAN: Status dari paket ini secara keseluruhan
             $table->enum('status', ['proses', 'selesai', 'dibatalkan'])->default('proses');
-
-            // PENJELASAN: (Opsional tapi bagus) Mencatat siapa yang membuat paket ini
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            
             $table->timestamps();
         });
     }

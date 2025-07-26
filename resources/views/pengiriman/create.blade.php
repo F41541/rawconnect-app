@@ -1,7 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container">
+    <div class="container py-1">
         <div class="row justify-content-center">
             <div class="col-lg-12">
                 <div class="card shadow-sm rounded-4">

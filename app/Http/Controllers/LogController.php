@@ -21,7 +21,7 @@ class LogController extends Controller
         $logs = $query->paginate(25)->withQueryString();
         
         return view('log.stok', [
-            'title' => 'Riwayat Perubahan Stok',
+            'title' => 'RIWAYAT PERUBAHAN STOK',
             'logs' => $logs,
         ]);
     }

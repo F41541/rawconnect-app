@@ -36,7 +36,7 @@ class KategoriController extends Controller
     public function create()
     {
         return view('kategori.create', [
-            'title' => 'Tambah Kategori Baru'
+            'title' => 'TAMBAH KATEGORI BARU',
         ]);
     }
 
@@ -58,7 +58,7 @@ class KategoriController extends Controller
     public function edit(Kategori $kategori)
     {
         return view('kategori.edit', [
-            'title' => 'Edit Kategori',
+            'title' => 'EDIT KATEGORI',
             'kategori' => $kategori,
         ]);
     }

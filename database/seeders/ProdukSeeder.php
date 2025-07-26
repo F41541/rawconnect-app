@@ -20,31 +20,25 @@ class ProdukSeeder extends Seeder
     {
         $this->command->info('Memulai proses seeding data contoh...');
 
-        // --- TAHAP 1: Buat semua data master ---
         $this->command->comment('Tahap 1: Membuat data master...');
 
-        // Kategori (firstOrCreate akan menemukan yang sudah dibuat oleh migrasi)
         $kategoriProdukJual = Kategori::firstOrCreate(['name' => 'Produk Jual']);
         $kategoriProdukJadi = Kategori::firstOrCreate(['name' => 'Produk Jadi']);
         $kategoriBahanBaku = Kategori::firstOrCreate(['name' => 'Bahan Baku']);
         $kategoriPouchSticker = Kategori::firstOrCreate(['name' => 'Pouch Printing & Sticker']);
         $kategoriKemasan = Kategori::firstOrCreate(['name' => 'Kemasan Dll']);
 
-        // Toko
         $tokoRawTisane = Toko::firstOrCreate(['name' => 'RAW TISANE']);
         $tokoTeaHouse = Toko::firstOrCreate(['name' => 'TEA HOUSE']);
 
-        // Merchant (sesuai permintaan, kapital semua)
         $merchantShopee = Merchant::firstOrCreate(['name' => 'SHOPEE']);
         $merchantTokopedia = Merchant::firstOrCreate(['name' => 'TOKOPEDIA']);
         $merchantLazada = Merchant::firstOrCreate(['name' => 'LAZADA']);
 
-        // Ekspedisi (sesuai permintaan, kapital semua)
         $ekspedisiJNE = Ekspedisi::firstOrCreate(['name' => 'JNE']);
         $ekspedisiJNT = Ekspedisi::firstOrCreate(['name' => 'JNT']);
         $ekspedisiSPX = Ekspedisi::firstOrCreate(['name' => 'SPX']);
         
-        // --- TAHAP 2: Buat Jenis Produk dan hubungkan ke Kategori ---
         $this->command->comment('Tahap 2: Membuat jenis produk dan relasinya...');
 
         $jp10bag = JenisProduk::firstOrCreate(['name' => '10 Tea Bag']);
@@ -83,14 +77,12 @@ class ProdukSeeder extends Seeder
         $jpAksesoris = JenisProduk::firstOrCreate(['name' => 'Aksesoris']);
         $jpAksesoris->kategoris()->syncWithoutDetaching([$kategoriProdukJual->id, $kategoriKemasan]);
 
-        // --- TAHAP 3: Buat Aturan Layanan Pengiriman ---
         $this->command->comment('Tahap 3: Membuat aturan layanan pengiriman...');
         LayananPengiriman::firstOrCreate(['toko_id' => $tokoRawTisane->id, 'merchant_id' => $merchantShopee->id, 'ekspedisi_id' => $ekspedisiJNE->id]);
         LayananPengiriman::firstOrCreate(['toko_id' => $tokoRawTisane->id, 'merchant_id' => $merchantShopee->id, 'ekspedisi_id' => $ekspedisiJNT->id]);
         LayananPengiriman::firstOrCreate(['toko_id' => $tokoRawTisane->id, 'merchant_id' => $merchantTokopedia->id, 'ekspedisi_id' => $ekspedisiJNT->id]);
         LayananPengiriman::firstOrCreate(['toko_id' => $tokoTeaHouse->id, 'merchant_id' => $merchantLazada->id, 'ekspedisi_id' => $ekspedisiSPX->id]);
 
-        // --- TAHAP 4: Buat Contoh Produk ---
         $this->command->comment('Tahap 4: Membuat contoh produk...');
         Produk::firstOrCreate(
             ['nama' => 'Teh Daun Mint', 'toko_id' => $tokoTeaHouse->id, 'jenis_produk_id' => $jp10bag->id],

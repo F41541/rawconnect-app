@@ -6,11 +6,10 @@ use Illuminate\Http\Request;
 
 class MasterController extends Controller
 {
-    // Method untuk menampilkan halaman hub
     public function index()
     {
         return view('superadmin.master.index', [
-            'title' => 'Pusat Manajemen Master'
+            'title' => 'PUSAT MANAJEMEN MASTER'
         ]);
     }
 }

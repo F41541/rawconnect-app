@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., 'Shopee', 'Tokopedia', 'TikTok Shop'
+            $table->string('name')->unique(); 
             $table->timestamps();
         });
     }

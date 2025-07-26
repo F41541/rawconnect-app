@@ -17,19 +17,15 @@ class LayananPengirimanController extends Controller
      */
     public function index()
     {
-        // 1. Ambil semua data, urutkan agar siap dikelompokkan
         $layananPengirimans = LayananPengiriman::with(['toko', 'merchant', 'ekspedisi'])
             ->orderBy('toko_id')
             ->orderBy('merchant_id')
             ->get();
 
-        // 2. Kelompokkan data dalam 2 level: Pertama berdasarkan nama toko, 
-        //    kemudian di dalamnya dikelompokkan lagi berdasarkan nama merchant.
         $groupedLayanan = $layananPengirimans->groupBy('toko.name')->map(function ($byToko) {
             return $byToko->groupBy('merchant.name');
         });
 
-        // 3. Kirim data yang sudah dikelompokkan ke view
         return view('layanan-pengiriman.index', [
             'title' => 'LAYANAN PENGIRIMAN',
             'groupedLayanan' => $groupedLayanan
@@ -41,7 +37,7 @@ class LayananPengirimanController extends Controller
     public function create()
     {
         return view('layanan-pengiriman.create', [
-            'title' => 'Tambah Layanan Pengiriman',
+            'title' => 'TAMBAH KONFIGURASI LAYANAN BARU',
             'tokos' => Toko::orderBy('name')->get(),
             'merchants' => Merchant::orderBy('name')->get(),
             'ekspedisis' => Ekspedisi::orderBy('name')->get(),
@@ -53,12 +49,11 @@ class LayananPengirimanController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi diubah untuk menerima array dari checkbox
         $validatedData = $request->validate([
             'toko_id'       => 'required|exists:tokos,id',
             'merchant_id'   => 'required|exists:merchants,id',
-            'ekspedisi_ids'  => 'required|array', // Harus berupa array
-            'ekspedisi_ids.*' => 'exists:ekspedisis,id', // Setiap item di array harus ada di tabel ekspedisis
+            'ekspedisi_ids'  => 'required|array', 
+            'ekspedisi_ids.*' => 'exists:ekspedisis,id', 
         ], [
             'ekspedisi_ids.required' => 'Anda harus memilih minimal satu ekspedisi.'
         ]);
@@ -67,18 +62,13 @@ class LayananPengirimanController extends Controller
         $merchantId = $validatedData['merchant_id'];
         $createdCount = 0;
 
-        // 2. Loop melalui setiap ekspedisi yang dipilih
         foreach ($validatedData['ekspedisi_ids'] as $ekspedisiId) {
-            // 3. Gunakan firstOrCreate untuk keamanan data
-            // Ini akan membuat data HANYA JIKA kombinasi ini belum ada.
-            // Mencegah duplikat data secara otomatis.
             $layanan = LayananPengiriman::firstOrCreate([
                 'toko_id' => $tokoId,
                 'merchant_id' => $merchantId,
                 'ekspedisi_id' => $ekspedisiId
             ]);
 
-            // Jika record baru benar-benar dibuat (bukan hanya ditemukan)
             if ($layanan->wasRecentlyCreated) {
                 $createdCount++;
             }

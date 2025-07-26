@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('jenis_produks', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., '10 Tea Bag', '20 Tea Bag', 'Single Tea', 'Loose Tea'
+            $table->string('name')->unique(); 
             $table->timestamps();
         });
     }

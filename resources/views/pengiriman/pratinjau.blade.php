@@ -1,7 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    <div class="container">
+    <div class="container py-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <a href="{{ route('pengiriman.create') }}" class="btn btn-outline-secondary" title="Kembali">
                 <i class="bi bi-arrow-left"></i>
@@ -18,81 +18,64 @@
         </div>
 
         @forelse ($groupedItems as $groupKey => $group)
-            @php $firstItem = $group->first(); @endphp
+            @php $firstItemInGroup = $group->first(); @endphp
 
-            <div class="card mb-3 shadow-sm rounded-4 border" style="background: #f6f8fa;">
-                <div class="card-header d-flex align-items-center gap-2 bg-white rounded-top-4 border-bottom-0">
-                    <img src="{{ optional(optional($firstItem)->toko)->logo ? asset('uploads/logo_toko/' . $firstItem->toko->logo) : asset('images/no-image.png') }}" 
-                        alt="Logo {{ optional($firstItem->toko)->name }}" 
+            <div class="card mb-3 shadow-sm rounded-4 border">
+                <div class="card-header d-flex align-items-center gap-1 bg-white rounded-top-4 border-bottom-0 ">
+                    <img src="{{ optional(optional($firstItemInGroup)->toko)->logo ? asset('uploads/logo_toko/' . $firstItemInGroup->toko->logo) : asset('images/no-image.png') }}" 
+                        alt="Logo {{ optional($firstItemInGroup->toko)->name }}" 
                         class="rounded-circle border" style="width: 36px; height: 36px; object-fit: contain;">
-                    <span class="fw-semibold">{{ optional($firstItem->toko)->name }}</span>
+                    <span class="fw-semibold">{{ optional($firstItemInGroup->toko)->name }}</span>
                     <span class="text-muted mx-1">|</span>
-                    <span class="fw-semibold">{{ optional($firstItem->merchant)->name }}</span>
+                    <span class="fw-semibold">{{ optional($firstItemInGroup->merchant)->name }}</span>
                     <span class="text-muted mx-1">|</span>
-                    <span class="fw-semibold">{{ optional($firstItem->ekspedisi)->name }}</span>
+                    <span class="fw-semibold">{{ optional($firstItemInGroup->ekspedisi)->name }}</span>
                 </div>
 
-                <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
                     @php
                         $groupedByJenis = $group->groupBy(fn($item) => optional(optional($item->produk)->jenisProduk)->name ?? 'Lain-lain');
                     @endphp
 
-                    <ul class="list-group list-group-flush">
-                        @foreach ($groupedByJenis as $jenisNama => $itemsByJenis)
-                            <li class="list-group-item px-3 py-2 bg-light-subtle border-0">
-                                <strong class="text-dark-emphasis">{{ $jenisNama }}</strong>
-                            </li>
+                    @foreach ($groupedByJenis as $jenisNama => $itemsByJenis)
+                        <li class="list-group-item px-3 py-2 bg-light">
+                            <strong class="text-dark-emphasis">{{ $jenisNama }}</strong>
+                        </li>
 
-                            @php
-                                $firstItem = $itemsByJenis->first();
-                                $restItems = $itemsByJenis->slice(1);
-                                $collapseId = 'group-'.$groupKey.'-'.Str::slug($jenisNama);
-                            @endphp
-
-                            {{-- Item pertama --}}
-                            @if($firstItem)
-                                <li class="list-group-item d-flex justify-content-between align-items-center ps-4 border-0">
+                        @foreach($itemsByJenis as $item)
+                            {{-- PERBAIKAN: Tata letak item dengan input jumlah & tombol hapus --}}
+                            <li class="list-group-item ps-4">
+                                <div style="display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 1rem;">
+                                    {{-- Kolom 1: Nama Produk & Varian --}}
                                     <div>
-                                        <strong>{{ optional($firstItem->produk)->nama ?? 'Produk Dihapus' }}</strong>
-                                        @if($firstItem->deskripsi_varian)
-                                            <small class="text-primary fw-bold d-block">{{ $firstItem->deskripsi_varian }}</small>
+                                        <strong>{{ optional($item->produk)->nama ?? 'Produk Dihapus' }}</strong>
+                                        @if($item->deskripsi_varian)
+                                            <small class="text-primary fw-bold d-block">{{ $item->deskripsi_varian }}</small>
                                         @endif
                                     </div>
-                                    <span class="badge bg-primary rounded-pill shadow-sm">x {{ $firstItem->jumlah }}</span>
-                                </li>
-                            @endif
 
-                            {{-- Sisanya pakai collapse --}}
-                            @if($restItems->isNotEmpty())
-                                <li class="list-group-item p-0 border-0">
-                                    <div class="collapse" id="{{ $collapseId }}">
-                                        <ul class="list-group list-group-flush">
-                                            @foreach($restItems as $item)
-                                                <li class="list-group-item d-flex justify-content-between align-items-center ps-4 border-0">
-                                                    <div>
-                                                        <strong>{{ optional($item->produk)->nama ?? 'Produk Dihapus' }}</strong>
-                                                        @if($item->deskripsi_varian)
-                                                            <small class="text-primary fw-bold d-block">{{ $item->deskripsi_varian }}</small>
-                                                        @endif
-                                                    </div>
-                                                    <span class="badge bg-primary rounded-pill shadow-sm">x {{ $item->jumlah }}</span>
-                                                </li>
-                                            @endforeach
-                                        </ul>
+                                    {{-- Kolom 2: Input Jumlah Interaktif --}}
+                                    <div class="d-flex align-items-center">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-update-jumlah" data-item-id="{{ $item->id }}" data-step="-1">-</button>
+                                        <input type="number" value="{{ $item->jumlah }}" class="form-control form-control-sm text-center mx-2 jumlah-input" data-item-id="{{ $item->id }}" min="1" style="width: 70px;">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-update-jumlah" data-item-id="{{ $item->id }}" data-step="1">+</button>
                                     </div>
-                                </li>
-                                <li class="list-group-item ps-4 py-2 border-0">
-                                    <a class="btn btn-sm btn-link text-decoration-none p-0 fw-bold collapse-trigger" data-bs-toggle="collapse" href="#{{ $collapseId }}" role="button">
-                                        <span class="collapse-text">Lihat {{ $restItems->count() }} item lainnya</span>
-                                    </a>
-                                </li>
-                            @endif
+                                    
+                                    {{-- Kolom 3: Tombol Hapus --}}
+                                    <form action="{{ route('pengiriman.hapus', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item ini dari pratinjau?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm text-danger" title="Hapus Item"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </li>
                         @endforeach
-                    </ul>
-                </div>
+                    @endforeach
+                </ul>
 
-                <div class="card-footer bg-light rounded-bottom-4 text-muted d-flex justify-content-between align-items-center small">
-                    <span>{{ $firstItem->created_at->format('H:i') }} | {{ optional($firstItem->user)->name ?? 'N/A' }}</span>
+                <div class="card-footer bg-white rounded-bottom-4 text-muted d-flex justify-content-between align-items-center small">
+                    <span>Dibuat Oleh: {{ optional($firstItemInGroup->user)->name ?? 'N/A' }}</span>
+                    <span>{{ optional ($firstItemInGroup->created_at)->format('d M Y, H:i') }}</span>
                 </div>
             </div>
         @empty
@@ -103,16 +86,11 @@
         @endforelse
     </div>
 
-
-
-    {{-- JavaScript Anda tidak perlu diubah, sudah benar --}}
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Definisikan timer di sini agar bisa diakses oleh semua event listener
                 let debounceTimer;
 
-                // Fungsi untuk mengirim update jumlah via AJAX (tidak berubah)
                 function updateJumlah(itemId, newJumlah) {
                     if (newJumlah < 1) return;
                     const url = `/pengiriman/pratinjau/update-jumlah/${itemId}`;

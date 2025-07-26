@@ -24,7 +24,6 @@ class ResetMasterDataCommand extends Command
         }
         $this->info('Memulai proses reset data infrastruktur...');
 
-        // Pertama, panggil command reset produk untuk membersihkan semua dependensi
         $this->call('app:reset-produk', ['--force' => true]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');

@@ -16,8 +16,6 @@ class StokAdjustmentController extends Controller
      */
     public function index()
     {
-        // PENJELASAN: Kita hanya perlu mengirim data untuk dropdown pertama saja.
-        // Dropdown lain akan diisi secara dinamis oleh JavaScript.
         $tokos = Toko::orderBy('name')->get();
 
         return view('stok-adj.index', [
@@ -103,14 +101,13 @@ class StokAdjustmentController extends Controller
         try {
             $produk = Produk::lockForUpdate()->findOrFail($validatedData['produk_id']);
             $jumlah = (int)$validatedData['jumlah'];
-            // PERBAIKAN: Gunakan null coalescing operator untuk keamanan
             $keterangan = $validatedData['keterangan'] ?? null; 
 
             if ($validatedData['tipe'] === 'masuk') {
                 $produk->recordStockChange($jumlah, 'penyesuaian', $keterangan);
                 $produk->increment('stok', $jumlah);
                 $actionText = 'ditambahkan';
-            } else { // Jika 'keluar'
+            } else { 
                 if ($produk->stok < $jumlah) {
                     DB::rollBack();
                     return redirect()->back()->withInput()->with('error', 'Gagal! Stok saat ini ('. $produk->stok .') lebih kecil dari jumlah yang ingin dikurangi ('. $jumlah .').');
@@ -123,7 +120,6 @@ class StokAdjustmentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            // Tambahkan pesan error yang lebih detail untuk debugging kita
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
 

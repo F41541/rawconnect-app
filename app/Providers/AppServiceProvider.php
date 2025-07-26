@@ -24,11 +24,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
-        // Bagikan data Kategori ke view sidebar secara global
         View::composer('components.sidebar', function ($view) {
-            // Hapus whereHas di awal untuk mengambil semua kategori
             $sidebarKategoris = Kategori::with(['jenisProduks' => function ($query) {
-                // Tapi kita tetap hanya ingin menampilkan Jenis Produk yang ada isinya
                 $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
             }])
             ->oldest()

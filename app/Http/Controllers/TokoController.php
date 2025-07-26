@@ -9,15 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
-/**
- * @property int $id
- * @property string $name
- * @property string|null $logo
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- */
-
 class TokoController extends Controller
 {
     public function index(Request $request)
@@ -29,7 +20,6 @@ class TokoController extends Controller
             $sortField = 'name';
         }
         
-        // PENJELASAN: Mengambil data Toko, diurutkan, dan dipaginasi. Baris duplikat dihapus.
         $tokos = Toko::orderBy($sortField, $sortOrder)->paginate(10);
         session(['index_return_url' => request()->fullUrl()]);
         return view('toko.index', [
@@ -43,7 +33,7 @@ class TokoController extends Controller
     public function create()
     {
         return view('toko.create', [
-            'title' => 'Tambah Toko Baru'
+            'title' => 'TAMBAH TOKO BARU',
         ]);
     }
 
@@ -66,14 +56,13 @@ class TokoController extends Controller
     public function edit(Toko $toko)
     {
         return view('toko.edit', [
-            'title' => 'Edit Toko',
+            'title' => 'EDIT TOKO',
             'toko' => $toko,
         ]);
     }
 
     public function update(Request $request, Toko $toko)
     {
-        // PENJELASAN: Menambahkan validasi untuk data checkbox yang dikirim
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('tokos')->ignore($toko->id)],
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -97,7 +86,6 @@ class TokoController extends Controller
 
     public function destroy(Toko $toko)
     {
-        // PENJELASAN: Pengaman lengkap untuk semua relasi
         if ($toko->produks()->exists()) {
             return redirect()->back()->with('error', 'Toko "'. $toko->name .'" tidak bisa dihapus karena masih digunakan oleh Produk');
         }

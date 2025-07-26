@@ -17,8 +17,8 @@
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Login</button>
+        <div class="d-grid shadow-sm">
+            <button type="submit" class="btn btn-primary shadow-sm">Login</button>
         </div>
     </form>
     <div class="mt-3 text-center">

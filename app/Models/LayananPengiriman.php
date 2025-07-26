@@ -11,9 +11,6 @@ class LayananPengiriman extends Model
     protected $table = 'layanan_pengiriman';
     protected $fillable = ['toko_id', 'merchant_id', 'ekspedisi_id'];
 
-    // PENJELASAN: Mendefinisikan bahwa setiap baris di tabel ini 'milik' satu Toko,
-    // satu Merchant, dan satu Ekspedisi.
-
     public function toko()
     {
         return $this->belongsTo(Toko::class);

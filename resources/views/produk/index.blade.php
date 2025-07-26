@@ -1,11 +1,11 @@
     <x-layout>
         <x-slot:title>{{ $title }}</x-slot:title>
-        <div class="container py-4">
+        <div class="container py-1">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{{ route('superadmin.master.index') }}" class="btn btn-outline-secondary me-2" title="Kembali">
-                    <i class="bi bi-arrow-left"></i>
+                <a href="{{ route('superadmin.master.index') }}" class="btn btn-light d-flex align-items-center border shadow-sm gap-2">
+                    <i class="bi bi-arrow-left me-2"></i> Kembali
                 </a>
-                <a href="{{ route('superadmin.produk.create') }}" class="btn btn-primary">
+                <a href="{{ route('superadmin.produk.create') }}" class="btn btn-primary shadow-sm d-flex align-items-center gap-2">
                     <i class="bi bi-plus-circle me-2"></i>Tambah Produk
                 </a>
             </div>

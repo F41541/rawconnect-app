@@ -13,16 +13,12 @@ use Illuminate\Validation\Rule;
 
 class ProdukController extends Controller
 {
-    // --- BAGIAN MANAJEMEN PRODUK (CRUD) ---
-
     /**
      * Menampilkan halaman utama untuk Manajemen Produk (Dashboard Kategori).
      */
     public function index()
     {
-        // Mengambil semua Kategori, diurutkan dari yang terlama
         $kategoris = Kategori::with(['jenisProduks' => function ($query) {
-            // PENJELASAN: Jenis Produk di dalam setiap kategori diurutkan berdasarkan abjad (A-Z) agar rapi.
             $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
         }])->oldest()->get();
 
@@ -40,7 +36,7 @@ class ProdukController extends Controller
     public function create()
     {
         return view('produk.create', [
-            'title'        => 'Tambah Produk Baru',
+            'title'        => 'TAMBAH PRODUK BARU',
             'tokos'        => Toko::orderBy('name')->get(),
             'jenisProduks' => JenisProduk::with('kategoris')->orderBy('name')->get(),
         ]);
@@ -79,7 +75,7 @@ class ProdukController extends Controller
     public function edit(Produk $produk)
     {
         return view('produk.edit', [
-            'title'        => 'Edit Produk',
+            'title'        => 'EDIT PRODUK',
             'produk'       => $produk,
             'tokos'        => Toko::orderBy('name')->get(),
             'jenisProduks' => JenisProduk::with('kategoris')->orderBy('name')->get(),
@@ -129,7 +125,6 @@ class ProdukController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil dihapus!');
     }
 
-    // --- BAGIAN HALAMAN STOK DINAMIS ---
     
     /**
      * Menampilkan daftar produk berdasarkan Jenis Produk yang dipilih.
@@ -152,7 +147,7 @@ class ProdukController extends Controller
         session(['produk_return_url' => request()->fullUrl()]);
 
         return view('stok.show', [
-            'title' => 'Stok: ' . $jenisProduk->name,
+            'title' => 'STOK: ' . $jenisProduk->name,
             'jenisProduk' => $jenisProduk,
             'produks' => $produks,
             'sortField' => $sortField,
@@ -167,22 +162,17 @@ class ProdukController extends Controller
     {
         $validated = $request->validate(['stok' => 'required|integer|min:0']);
 
-        // 1. Ambil nilai stok lama dan baru
         $stokLama = $produk->stok;
         $stokBaru = $validated['stok'];
 
-        // 2. Hitung selisih perubahannya
         $perubahan = $stokBaru - $stokLama;
 
-        // Jika tidak ada perubahan, tidak perlu lakukan apa-apa
         if ($perubahan == 0) {
             return redirect()->back()->with('info', 'Tidak ada perubahan pada stok.');
         }
         
-        // 3. Catat perubahan ke log DULU
         $produk->recordStockChange($perubahan, 'koreksi manual');
         
-        // 4. BARU update stoknya
         $produk->update(['stok' => $stokBaru]);
 
         return redirect()->back()->with('success', 'Stok untuk produk "'. $produk->nama .'" berhasil dikoreksi!');

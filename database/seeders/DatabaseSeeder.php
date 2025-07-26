@@ -13,10 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // TUGAS 1: Buat user default (penting untuk semua lingkungan)
         User::firstOrCreate(
-            ['email' => 'superadmin@rawconnect.test'], // Kunci untuk mencari
-            values: [ // Data yang akan dibuat jika tidak ditemukan
+            ['email' => 'superadmin@rawconnect.test'], 
+            values: [ 
             'name' => 'Feygi Setiawan',
             'password' => Hash::make('password'),
             'role' => 'super-admin',
@@ -24,8 +23,8 @@ class DatabaseSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => 'mfaisalfahri02@gmail.com'], // Kunci untuk mencari
-            values: [ // Data yang akan dibuat jika tidak ditemukan
+            ['email' => 'mfaisalfahri02@gmail.com'], 
+            values: [
             'name' => 'M. Faisal Fahri',
             'password' => Hash::make('12345678'),
             'role' => 'pegawai',

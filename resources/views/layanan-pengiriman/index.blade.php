@@ -1,36 +1,35 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
-    <div class="container py-4">
+
+    <div class="container py-1">
+        {{-- Tombol Aksi Atas --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="{{ route('superadmin.master.index') }}" class="btn btn-outline-secondary me-2" title="Kembali">
-                <i class="bi bi-arrow-left"></i>
+            <a href="{{ route('superadmin.master.index') }}" class="btn btn-light d-flex align-items-center border shadow-sm gap-2">
+                <i class="bi bi-arrow-left me-2"></i> Kembali
             </a>
-            <a href="{{ route('superadmin.layanan-pengiriman.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Tambah Layanan
+            <a href="{{ route('superadmin.layanan-pengiriman.create') }}" class="btn btn-primary shadow-sm d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle me-2"></i> Tambah Layanan
             </a>
         </div>
+
+        {{-- Daftar Group Toko --}}
         @forelse ($groupedLayanan as $namaToko => $byToko)
-            <div class="card mb-4">
-                <div class="card-header fw-bold fs-5">
-                    {{-- Loop Terluar: Menampilkan Nama Toko --}}
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header bg-light fw-semibold fs-5 border-bottom">
                     {{ $namaToko }}
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($byToko as $namaMerchant => $byMerchant)
-                        {{-- Loop Tengah: Menampilkan Nama Merchant --}}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span class="fw-medium">{{ $namaMerchant }}</span>
-                            
-                            {{-- Loop Terdalam: Menampilkan Ekspedisi sebagai badge --}}
+                        <li class="list-group-item d-flex justify-content-between align-items-start flex-column flex-md-row gap-2">
+                            <div class="fw-medium text-dark mb-2 mb-md-0">{{ $namaMerchant }}</div>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach ($byMerchant as $layanan)
-                                    <div class="d-inline-flex align-items-center gap-1 border rounded-pill px-2 py-1 bg-light">
-                                        <span class="fw-bold" style="font-size: 0.85rem;">{{ $layanan->ekspedisi->name }}</span>
-                                        {{-- Form hapus untuk setiap ekspedisi individu --}}
-                                        <form action="{{ route('superadmin.layanan-pengiriman.destroy', $layanan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus layanan {{ $layanan->ekspedisi->name }} dari merchant ini?')">
+                                    <div class="d-flex align-items-center gap-1 bg-body-secondary px-3 py-1 rounded-pill border border-light shadow-sm">
+                                        <span class="fw-semibold small">{{ $layanan->ekspedisi->name }}</span>
+                                        <form action="{{ route('superadmin.layanan-pengiriman.destroy', $layanan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus layanan {{ $layanan->ekspedisi->name }}?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn-close" aria-label="Close" style="width: 0.5em; height: 0.5em;"></button>
+                                            <button type="submit" class="btn-close btn-close-sm ms-1" aria-label="Close" style="filter: brightness(0.5);"></button>
                                         </form>
                                     </div>
                                 @endforeach
@@ -40,7 +39,7 @@
                 </ul>
             </div>
         @empty
-            <div class="alert alert-info text-center">
+            <div class="alert alert-info text-center shadow-sm">
                 Belum ada layanan pengiriman yang dikonfigurasi.
             </div>
         @endforelse

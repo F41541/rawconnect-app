@@ -13,10 +13,6 @@ return new class extends Migration
     {
         Schema::create('pratinjau_items', function (Blueprint $table) {
             $table->id();
-
-            // Kolom-kolom ini akan menyimpan semua informasi yang kita butuhkan
-            // untuk nanti mengelompokkannya menjadi Paket Pengiriman.
-            
             $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
             $table->unsignedInteger('jumlah');
             $table->decimal('berat_per_item', 10, 2)->nullable();
@@ -24,10 +20,7 @@ return new class extends Migration
             $table->foreignId('toko_id')->constrained('tokos')->onDelete('cascade');
             $table->foreignId('merchant_id')->constrained('merchants')->onDelete('cascade');
             $table->foreignId('ekspedisi_id')->constrained('ekspedisis')->onDelete('cascade');
-            
-            // Mencatat siapa yang menambahkan item ini
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-
             $table->timestamps();
         });
     }

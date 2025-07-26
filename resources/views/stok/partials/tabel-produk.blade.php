@@ -26,6 +26,7 @@
                         Stok <span>{{ $arrow }}</span>
                     </a>
                 </th>
+                <th>Satuan</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -43,8 +44,10 @@
                     <td class="fw-medium">{{ $produk->nama }}</td>
                     <td>{{ $produk->toko->name ?? 'N/A' }}</td>
                     <td>
-                        <span>{{ $produk->stok }}</span>
+                        <span>{{ number_format($produk->stok, 0, ',', '.') }}</span>
                     </td>
+                    <td><span?>{{ $produk->satuan }}</span></td>
+
                     <td>
                         @can('is-super-admin')
                             <a href="{{ route('superadmin.produk.edit', $produk->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">

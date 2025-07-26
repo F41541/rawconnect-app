@@ -1,6 +1,6 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
-    <div class="container py-4">
+    <div class="container py-1">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">

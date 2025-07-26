@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('ekspedisis', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // e.g., 'JNE', 'J&T', 'SPX'
+            $table->string('name')->unique(); 
             $table->timestamps();
         });
     }

@@ -31,8 +31,8 @@ class Produk extends Model
         'nama',
         'foto',
         'stok',
-        'minimal_stok', // <-- PENJELASAN: Ini adalah perbaikan penting yang kita tambahkan
-        'satuan', // <-- PENJELASAN: Ini adalah perbaikan penting yang kita tambahkan
+        'minimal_stok',
+        'satuan',
         'jenis_produk_id',
         'toko_id',
     ];

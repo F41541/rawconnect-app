@@ -9,15 +9,12 @@ import Chart from 'chart.js/auto';
 import './script.js';
 import Alpine from 'alpinejs';
 
-// --- LOGIKA UTAMA SETELAH HALAMAN DIMUAT ---
 document.addEventListener('DOMContentLoaded', () => {
 
     const pageDataEl = document.getElementById('page-data');
 
-    // Jika elemen jembatan data tidak ada, jangan lakukan apa-apa
     if (!pageDataEl) return;
 
-    // --- Logika 1: Notifikasi (Hanya berjalan jika ada pesan sesi) ---
     const sessionMessage = pageDataEl.dataset.sessionMessage;
     if (sessionMessage) {
         const sessionStatus = pageDataEl.dataset.sessionStatus;
@@ -28,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sessionStatus === 'error') toastr.error(sessionMessage);
     }
 
-    // --- Logika 2: Grafik Penjualan (Hanya berjalan jika ada kanvas dan datanya) ---
     const salesChartCanvas = document.getElementById('salesChart');
     if (salesChartCanvas && pageDataEl.dataset.salesChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.salesChartLabels);
@@ -40,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Logika 3: Grafik Stok (Hanya berjalan jika ada kanvas dan datanya) ---
     const stockChartCanvas = document.getElementById('stockMovementChart');
     if (stockChartCanvas && pageDataEl.dataset.stockChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.stockChartLabels);
@@ -52,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Logika 4: Grafik Merchant (Hanya berjalan jika ada kanvas dan datanya) ---
     const merchantChartCanvas = document.getElementById('merchantPieChart');
     if (merchantChartCanvas && pageDataEl.dataset.merchantChartLabels) {
         const labels = JSON.parse(pageDataEl.dataset.merchantChartLabels);
@@ -64,6 +58,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Jalankan Alpine.js di akhir
 window.Alpine = Alpine;
 Alpine.start();

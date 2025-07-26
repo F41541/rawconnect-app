@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->integer('jumlah_berubah'); // Bisa positif (masuk) atau negatif (keluar)
+            $table->integer('jumlah_berubah');
             $table->integer('stok_sebelum');
             $table->integer('stok_sesudah');
-            $table->string('tipe'); // Contoh: 'penjualan', 'penyesuaian', 'koreksi'
+            $table->string('tipe'); 
             $table->string('keterangan')->nullable();
             $table->timestamps();
         });
