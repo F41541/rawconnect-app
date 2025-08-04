@@ -25,16 +25,20 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
-        if (Schema::hasTable('kategoris')) {
-            View::composer('components.sidebar', function ($view) {
-                $sidebarKategoris = Kategori::with(['jenisProduks' => function ($query) {
-                    $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
-                }])
-                ->oldest()
-                ->get();
+        try {
+            if (Schema::hasTable('kategoris')) {
+                View::composer('components.sidebar', function ($view) {
+                    $sidebarKategoris = Kategori::with(['jenisProduks' => function ($query) {
+                        $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
+                    }])
+                    ->oldest()
+                    ->get();
 
-                $view->with('sidebarKategoris', $sidebarKategoris);
-            });
+                    $view->with('sidebarKategoris', $sidebarKategoris);
+                });
+            }
+        } catch (\Exception $e) {
+            // Jika database belum siap, abaikan saja, jangan error
         }
     }
 }

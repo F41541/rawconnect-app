@@ -63,16 +63,16 @@ class ProdukSeeder extends Seeder
         $jpHerbSpice->kategoris()->syncWithoutDetaching([$kategoriProdukJual->id, $kategoriBahanBaku->id]);
 
         $jpPowder = JenisProduk::firstOrCreate(['name' => 'Bahan Baku Powder']);
-        $jpPowder->kategoris()->syncWithoutDetaching($kategoriBahanBaku->id);
+        $jpPowder->kategoris()->syncWithoutDetaching([$kategoriBahanBaku->id]);
         
         $jpPouchPrinting = JenisProduk::firstOrCreate(['name' => 'Pouch Printing']);
-        $jpPouchPrinting->kategoris()->syncWithoutDetaching($kategoriPouchSticker->id);
+        $jpPouchPrinting->kategoris()->syncWithoutDetaching([$kategoriPouchSticker->id]);
 
         $jpSticker = JenisProduk::firstOrCreate(['name' => 'Sticker']);
-        $jpSticker->kategoris()->syncWithoutDetaching($kategoriPouchSticker->id);
+        $jpSticker->kategoris()->syncWithoutDetaching([$kategoriPouchSticker->id]);
         
         $jpKemasanLain = JenisProduk::firstOrCreate(['name' => 'Kemasan']);
-        $jpKemasanLain->kategoris()->syncWithoutDetaching($kategoriKemasan->id);
+        $jpKemasanLain->kategoris()->syncWithoutDetaching([$kategoriKemasan->id]);
         
         $jpAksesoris = JenisProduk::firstOrCreate(['name' => 'Aksesoris']);
         $jpAksesoris->kategoris()->syncWithoutDetaching([$kategoriProdukJual->id, $kategoriKemasan]);
