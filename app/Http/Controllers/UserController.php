@@ -11,9 +11,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('id', '!=', auth()->id())
-                            ->orderBy('name', 'asc')
-                            ->paginate(10);
+        $users = User::orderBy('name', 'asc')->paginate(10);
 
         return view('user.index', [
             'title' => 'MANAJEMEN PENGGUNA',
