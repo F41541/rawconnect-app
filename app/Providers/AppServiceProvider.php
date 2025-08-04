@@ -25,6 +25,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
+        // Force HTTPS di production
+        if (app()->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Jangan jalankan kode ini saat di CLI (deploy, migrate, dsb)
         if (app()->runningInConsole()) {
             return;
