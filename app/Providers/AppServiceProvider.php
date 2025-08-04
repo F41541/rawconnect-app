@@ -23,22 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrapFive();
 
-        try {
-            if (Schema::hasTable('kategoris')) {
-                View::composer('components.sidebar', function ($view) {
-                    $sidebarKategoris = Kategori::with(['jenisProduks' => function ($query) {
-                        $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
-                    }])
-                    ->oldest()
-                    ->get();
-
-                    $view->with('sidebarKategoris', $sidebarKategoris);
-                });
-            }
-        } catch (\Exception $e) {
-            // Jika database belum siap, abaikan saja, jangan error
-        }
     }
 }
