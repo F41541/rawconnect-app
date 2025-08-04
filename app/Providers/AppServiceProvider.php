@@ -6,7 +6,7 @@ use App\Models\Kategori; //
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View; // 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Cache; 
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,16 +25,16 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
-        View::composer('components.sidebar', function ($view) {
-            $sidebarKategoris = Cache::remember('sidebar_kategoris', 3600, function () {
-                return Kategori::with(['jenisProduks' => function ($query) {
+        if (Schema::hasTable('kategoris')) {
+            View::composer('components.sidebar', function ($view) {
+                $sidebarKategoris = Kategori::with(['jenisProduks' => function ($query) {
                     $query->whereHas('produks')->withCount('produks')->orderBy('name', 'asc');
                 }])
                 ->oldest()
                 ->get();
-            });
 
-            $view->with('sidebarKategoris', $sidebarKategoris);
-        });
+                $view->with('sidebarKategoris', $sidebarKategoris);
+            });
+        }
     }
 }
