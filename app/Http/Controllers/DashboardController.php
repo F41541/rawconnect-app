@@ -8,61 +8,26 @@ use App\Models\PaketPengiriman;
 use Illuminate\Http\Request;
 use App\Models\ItemPaket;
 use App\Models\StockLog;
-use Illuminate\Support\Facades\Auth;
+use App\Models\JenisProduk;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-
-
 
 class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $tanggalMulai = $request->input('tanggal_mulai', now()->subDays(6)->toDateString());
-        $tanggalSelesai = $request->input('tanggal_selesai', now()->toDateString());
         $user = auth()->user();
-        $data = [];
 
-        $data['jumlah_proses'] = PaketPengiriman::where('status', 'proses')->count();
-        $data['jumlah_selesai'] = PaketPengiriman::where('status', 'selesai')->count();
-        $data['jumlah_dibatalkan'] = PaketPengiriman::where('status', 'dibatalkan')->count();
-        $data['jumlah_pratinjau'] = PratinjauItem::count();
-        $sort = $request->input('sort', 'stok_asc'); 
+        // Ambil data ringkasan
+        $cardData = $this->getCardData($user);
 
-        $query = Produk::with(['toko', 'jenisProduk.kategoris'])
-            ->whereRaw('stok < minimal_stok')
-            ->where('stok', '>', 0);
+        // Ambil data stok rendah + grafik (khusus super admin)
+        $combinedData = $this->getWidgetAndChartData($request, $user);
 
-        switch ($sort) {
-            case 'jenis_produk':
-                $query->join('jenis_produks', 'produks.jenis_produk_id', '=', 'jenis_produks.id')
-                    ->orderBy('jenis_produks.name', 'asc')
-                    ->orderBy('produks.stok', 'asc')
-                    ->select('produks.*');
-                break;
-            case 'toko':
-                $query->join('tokos', 'produks.toko_id', '=', 'tokos.id')
-                    ->orderBy('tokos.name', 'asc')
-                    ->orderBy('produks.stok', 'asc')
-                    ->select('produks.*');
-                break;
-            default: 
-                $query->orderBy('stok', 'asc');
-                break;
-        }
+        // Data dropdown jenis produk
+        $combinedData['jenis_produk_list'] = JenisProduk::orderBy('name')->get();
 
-        $data['produk_stok_rendah'] = $query->get();
-        $data['current_sort'] = $sort; 
-
-        if ($user->can('is-super-admin')) {
-            $today = now()->toDateString();
-            $data['penjualan_hari_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) => $q->where('status', 'selesai')->whereDate('created_at', $today))->sum('jumlah');
-            $data['penjualan_bulan_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) => $q->where('status', 'selesai')->whereMonth('created_at', now()->month))->sum('jumlah');
-        }
-
-        $chartData = $this->getChartData();
-
-        $data = array_merge($data, $chartData);
+        // Gabungkan semua data
+        $data = array_merge($cardData, $combinedData);
 
         return view('dashboard', [
             'title' => 'DASHBOARD',
@@ -70,56 +35,130 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Method pembantu pribadi untuk mengambil dan memproses semua data untuk grafik.
-     */
-    private function getChartData(): array
+    private function getCardData($user): array
     {
-        $data = [];
-        // Ambil tanggal dari request (via query string), default 7 hari terakhir
-        $tanggalMulai = request('tanggal_mulai', now()->subDays(6)->toDateString());
-        $tanggalSelesai = request('tanggal_selesai', now()->toDateString());
+        $data = [
+            'jumlah_proses'     => PaketPengiriman::where('status', 'proses')->count(),
+            'jumlah_selesai'    => PaketPengiriman::where('status', 'selesai')->whereDate('updated_at', today())->count(),
+            'jumlah_dibatalkan' => PaketPengiriman::where('status', 'dibatalkan')->whereDate('updated_at', today())->count(),
+            'jumlah_pratinjau'  => 0,
+        ];
 
-        // Buat range tanggal untuk label grafik
-        $dateRange = collect(range(0, (strtotime($tanggalSelesai) - strtotime($tanggalMulai)) / 86400))
-            ->map(fn($day) => \Carbon\Carbon::parse($tanggalMulai)->addDays($day));
-
-        // --- Data untuk Grafik Penjualan 7 Hari (atau range yang dipilih) ---
-        $salesData = ItemPaket::whereHas('paketPengiriman', function($q) use ($tanggalMulai, $tanggalSelesai) {
-                $q->where('status', 'selesai')
-                  ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai]);
-            })
-            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah) as total'))
-            ->groupBy('tanggal')->orderBy('tanggal', 'asc')->get()->keyBy('tanggal');
-            
-        $data['chartLabels'] = $dateRange->map(fn($date) => $date->format('d M'))->toArray();
-        $data['chartData'] = $dateRange->map(fn($date) => $salesData->get($date->format('Y-m-d'))->total ?? 0)->toArray();
-
-        // --- Data untuk Grafik Stok Masuk vs Keluar ---
-        $stokMasukData = StockLog::where('jumlah_berubah', '>', 0)
-            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
-            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
-            ->groupBy('tanggal')->get()->keyBy('tanggal');
-        $stokKeluarData = StockLog::where('jumlah_berubah', '<', 0)
-            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
-            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('sum(jumlah_berubah) as total'))
-            ->groupBy('tanggal')->get()->keyBy('tanggal');
-
-        $data['stockChartLabels'] = $data['chartLabels'];
-        $data['stockMasukData'] = $dateRange->map(fn($date) => $stokMasukData->get($date->format('Y-m-d'))->total ?? 0)->toArray();
-        $data['stockKeluarData'] = $dateRange->map(fn($date) => abs($stokKeluarData->get($date->format('Y-m-d'))->total ?? 0))->toArray();
-
-        // --- Data untuk Grafik Penjualan per Merchant ---
-        $salesByMerchant = PaketPengiriman::where('status', 'selesai')
-            ->whereBetween(DB::raw('DATE(paket_pengiriman.created_at)'), [$tanggalMulai, $tanggalSelesai])
-            ->join('merchants', 'paket_pengiriman.merchant_id', '=', 'merchants.id')
-            ->select('merchants.name as nama_merchant', DB::raw('count(*) as total'))
-            ->groupBy('merchants.name')->orderBy('total', 'desc')->get();
-
-        $data['merchantLabels'] = $salesByMerchant->pluck('nama_merchant');
-        $data['merchantData'] = $salesByMerchant->pluck('total');
+        if ($user->can('create-shipments')) {
+            $data['jumlah_pratinjau'] = PratinjauItem::where('user_id', $user->id)->count();
+        }
 
         return $data;
     }
 
+    private function getWidgetAndChartData(Request $request, $user): array
+    {
+        $data = [];
+
+        $tanggalMulai  = $request->input('tanggal_mulai', now()->subDays(6)->toDateString());
+        $tanggalSelesai = $request->input('tanggal_selesai', now()->toDateString());
+        $jenisProdukIdFilter = $request->input('jenis_produk_stok');
+
+        // --- Data Widget: Produk Stok Rendah (untuk semua role) ---
+        $sort = $request->input('sort', 'stok_asc');
+        $query = Produk::with(['toko', 'jenisProduk.kategoris'])
+            ->whereRaw('stok <= minimal_stok')->where('stok', '>', 0);
+
+        switch ($sort) {
+            case 'jenis_produk':
+                $query->join('jenis_produks', 'produks.jenis_produk_id', '=', 'jenis_produks.id')
+                      ->orderBy('jenis_produks.name')->orderBy('produks.stok')->select('produks.*');
+                break;
+            case 'toko':
+                $query->join('tokos', 'produks.toko_id', '=', 'tokos.id')
+                      ->orderBy('tokos.name')->orderBy('produks.stok')->select('produks.*');
+                break;
+            default:
+                $query->orderBy('stok');
+                break;
+        }
+
+        $data['produk_stok_rendah'] = $query->get();
+        $data['current_sort'] = $sort;
+
+        // --- Sisanya hanya untuk Super Admin ---
+        if (!$user->can('is-super-admin')) {
+            return $data;
+        }
+
+        // Generate range tanggal
+        $dateRange = collect(range(0, (strtotime($tanggalSelesai) - strtotime($tanggalMulai)) / 86400))
+            ->map(fn($day) => \Carbon\Carbon::parse($tanggalMulai)->addDays($day));
+        $data['chartLabels'] = $dateRange->map(fn($date) => $date->format('d M'))->toArray();
+
+        // Grafik Penjualan (sales chart)
+        $salesData = ItemPaket::whereHas('paketPengiriman', fn($q) =>
+            $q->where('status', 'selesai')->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
+        )
+            ->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('SUM(jumlah) as total'))
+            ->groupBy('tanggal')->orderBy('tanggal')->get()->keyBy('tanggal');
+        $data['chartData'] = $dateRange->map(fn($date) =>
+            $salesData->get($date->format('Y-m-d'))->total ?? 0
+        )->toArray();
+
+        // Grafik Stok Masuk vs Keluar
+        $stokMasukQuery = StockLog::where('jumlah_berubah', '>', 0)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai]);
+        $stokKeluarQuery = StockLog::where('jumlah_berubah', '<', 0)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai]);
+
+        if ($jenisProdukIdFilter) {
+            $stokMasukQuery->whereHas('produk', fn($q) =>
+                $q->where('jenis_produk_id', $jenisProdukIdFilter)
+            );
+            $stokKeluarQuery->whereHas('produk', fn($q) =>
+                $q->where('jenis_produk_id', $jenisProdukIdFilter)
+            );
+        }
+
+        $stokMasukData = $stokMasukQuery->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('SUM(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+        $stokKeluarData = $stokKeluarQuery->select(DB::raw('DATE(created_at) as tanggal'), DB::raw('SUM(jumlah_berubah) as total'))
+            ->groupBy('tanggal')->get()->keyBy('tanggal');
+
+        $data['stockChartLabels'] = $data['chartLabels'];
+        $data['stockMasukData'] = $dateRange->map(fn($date) =>
+            $stokMasukData->get($date->format('Y-m-d'))->total ?? 0
+        )->toArray();
+        $data['stockKeluarData'] = $dateRange->map(fn($date) =>
+            abs($stokKeluarData->get($date->format('Y-m-d'))->total ?? 0)
+        )->toArray();
+
+        // Grafik Penjualan per Merchant
+        $salesByMerchant = PaketPengiriman::where('status', 'selesai')
+            ->whereBetween(DB::raw('DATE(paket_pengiriman.created_at)'), [$tanggalMulai, $tanggalSelesai])
+            ->join('merchants', 'paket_pengiriman.merchant_id', '=', 'merchants.id')
+            ->select('merchants.name as nama_merchant', DB::raw('COUNT(*) as total'))
+            ->groupBy('merchants.name')->orderByDesc('total')->get();
+
+        $data['merchantLabels'] = $salesByMerchant->pluck('nama_merchant');
+        $data['merchantData'] = $salesByMerchant->pluck('total');
+
+        // Grafik Produk Terlaris
+        $produkTerlaris = ItemPaket::whereHas('paketPengiriman', fn($q) =>
+            $q->where('status', 'selesai')->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalSelesai])
+        )
+            ->join('produks', 'item_paket.produk_id', '=', 'produks.id')
+            ->select('produks.nama', DB::raw('SUM(CASE WHEN item_paket.berat_per_item > 0 THEN item_paket.jumlah * item_paket.berat_per_item ELSE item_paket.jumlah END) as total_terjual'))
+            ->groupBy('produks.nama')->orderByDesc('total_terjual')->limit(5)->get();
+
+        $data['topProdukLabels'] = $produkTerlaris->pluck('nama');
+        $data['topProdukData'] = $produkTerlaris->pluck('total_terjual');
+
+        // Penjualan Ringkasan
+        $data['penjualan_hari_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) =>
+            $q->where('status', 'selesai')->whereDate('created_at', now()->toDateString())
+        )->sum('jumlah');
+
+        $data['penjualan_bulan_ini'] = ItemPaket::whereHas('paketPengiriman', fn($q) =>
+            $q->where('status', 'selesai')->whereMonth('created_at', now()->month)
+        )->sum('jumlah');
+
+        return $data;
+    }
 }

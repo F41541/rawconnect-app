@@ -51,6 +51,10 @@ public function boot(): void
         return in_array($user->role, ['super-admin', 'admin', 'pegawai']);
     });
 
+    Gate::define('all', function (User $user) {
+        return in_array($user->role, ['super-admin', 'admin', 'pegawai']);
+    });
+
     // Izin untuk update item di pratinjau (hanya pemilik)
     Gate::define('update-pratinjau-item', function (User $user, PratinjauItem $pratinjauItem) {
         return $user->id === $pratinjauItem->user_id;

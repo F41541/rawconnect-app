@@ -9,7 +9,9 @@ import Chart from 'chart.js/auto';
 import './script.js';
 import Alpine from 'alpinejs';
 
+
 document.addEventListener('DOMContentLoaded', () => {
+    
 
     const pageDataEl = document.getElementById('page-data');
 
@@ -56,6 +58,33 @@ document.addEventListener('DOMContentLoaded', () => {
             options: { responsive: true, maintainAspectRatio: false }
         });
     }
+
+    // 4. Logika Grafik Produk Terlaris (Horizontal Bar)
+    const topProductsCanvas = document.getElementById('topProductsChart');
+    if (topProductsCanvas && pageDataEl.dataset.topProdukLabels) {
+        const labels = JSON.parse(pageDataEl.dataset.topProdukLabels);
+        const data = JSON.parse(pageDataEl.dataset.topProdukData);
+        new Chart(topProductsCanvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Terjual',
+                    data: data,
+                    backgroundColor: 'rgba(0, 145, 255, 0.7)', 
+                    borderColor: 'rgba(0, 145, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } } // Sembunyikan legend
+            }
+        });
+    }
+
 });
 
 window.Alpine = Alpine;

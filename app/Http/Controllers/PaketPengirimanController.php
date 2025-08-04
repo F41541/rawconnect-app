@@ -28,8 +28,10 @@ class PaketPengirimanController extends Controller
      */
     public function index()
     {
+        // Relasi yang akan di-load untuk setiap paket
         $relations = ['toko', 'merchant', 'ekspedisi', 'user', 'items.produk.jenisProduk'];
 
+        // 1. Mengambil DAFTAR PAKET untuk ditampilkan di konten setiap tab (dengan paginasi)
         $paket_proses = PaketPengiriman::where('status', 'proses')
                                        ->with($relations)
                                        ->latest()
@@ -45,11 +47,20 @@ class PaketPengirimanController extends Controller
                                          ->latest()
                                          ->paginate(10, ['*'], 'dibatalkanPage');
 
+        // 2. Mengambil HITUNGAN spesifik untuk ditampilkan di BADGE tab
+        $jumlah_proses_total = PaketPengiriman::where('status', 'proses')->count();
+        $jumlah_selesai_hari_ini = PaketPengiriman::where('status', 'selesai')->whereDate('updated_at', today())->count();
+        $jumlah_dibatalkan_hari_ini = PaketPengiriman::where('status', 'dibatalkan')->whereDate('updated_at', today())->count();
+
+        // 3. Kirim semua data yang dibutuhkan ke view
         return view('pengiriman.index', [
             'title' => 'DAFTAR PENGIRIMAN',
             'paket_proses' => $paket_proses,
             'paket_selesai' => $paket_selesai,
             'paket_dibatalkan' => $paket_dibatalkan,
+            'jumlah_proses' => $jumlah_proses_total,
+            'jumlah_selesai' => $jumlah_selesai_hari_ini,
+            'jumlah_dibatalkan' => $jumlah_dibatalkan_hari_ini,
         ]);
     }
 

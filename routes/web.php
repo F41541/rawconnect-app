@@ -17,6 +17,7 @@ use App\Http\Controllers\SuperAdmin\LaporanController;
 use App\Http\Controllers\SuperAdmin\MasterController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Analisis\LaporanStokRendahController;
 
 
 // Rute Autentikasi dari Breeze
@@ -41,6 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Mengubah status juga bisa dilakukan semua peran (namun opsi 'dibatalkan' akan di-handle di view & controller)
     Route::patch('/pengiriman/paket/{paketPengiriman}/update-status', [PaketPengirimanController::class, 'updateStatusPaket'])->name('paket.updateStatus');
     Route::get('/log/stok', [LogController::class, 'stokLog'])->name('log.stok');
+    Route::get('/laporan/stok-rendah', LaporanStokRendahController::class)->name('laporan.stok-rendah');
+    Route::get('/laporan/produk-terlaris', [LaporanController::class, 'produkTerlaris'])->name('laporan.produk-terlaris');
 
     // --- GRUP 2: Rute untuk PEGAWAI & ADMIN (sesuai Gate 'adjust-stock') ---
     Route::middleware('can:adjust-stock')->group(function() {

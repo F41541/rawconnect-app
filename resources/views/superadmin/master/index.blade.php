@@ -19,16 +19,16 @@
                         'desc' => 'Kelola semua jenis produk.',
                     ],
                     [
-                        'route' => 'superadmin.produk.index',
-                        'icon' => 'bi-box-seam',
-                        'title' => 'Manajemen Produk',
-                        'desc' => 'Kelola semua produk.',
-                    ],
-                    [
                         'route' => 'superadmin.toko.index',
                         'icon' => 'bi-shop',
                         'title' => 'Manajemen Toko',
                         'desc' => 'Kelola semua data toko atau cabang.',
+                    ],
+                    [
+                        'route' => 'superadmin.produk.index',
+                        'icon' => 'bi-box-seam',
+                        'title' => 'Manajemen Produk',
+                        'desc' => 'Kelola semua produk.',
                     ],
                     [
                         'route' => 'superadmin.merchant.index',
