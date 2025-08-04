@@ -1,15 +1,17 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-@import 'toastr/build/toastr.min.css';
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "toastr/build/toastr.min.css";
 
 /* ===========================
    GLOBAL & RESET STYLING
    =========================== */
 
 /*Aturan scrollbar untuk html, body, dan sidebar digabung di sini agar terpusat dan tidak duplikat. */
-html, body, .sidebar {
-    -ms-overflow-style: none;  /* IE dan Edge */
-    scrollbar-width: none;  /* Firefox */
+html,
+body,
+.sidebar {
+    -ms-overflow-style: none; /* IE dan Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 html::-webkit-scrollbar,
@@ -20,18 +22,18 @@ body::-webkit-scrollbar,
 
 /*Aturan padding utama dipindahkan ke sini agar lebih terorganisir */
 body {
-     margin: 0;
-     padding-top: 60px; /* Jarak untuk header yang fixed */
-     padding-left: 300px; /* Jarak untuk sidebar yang fixed */
-     background-color: #ffffff;
-     transition: padding-left 0.3s ease;
+    margin: 0;
+    padding-top: 60px; /* Jarak untuk header yang fixed */
+    padding-left: 300px; /* Jarak untuk sidebar yang fixed */
+    background-color: #ffffff;
+    transition: padding-left 0.3s ease;
 }
 
 /* ===========================
     ICON STYLING
     =========================== */
 .bi {
-     font-size: 20px;
+    font-size: 20px;
 }
 
 /* ===========================
@@ -39,72 +41,72 @@ body {
     =========================== */
 /*Semua aturan untuk .sidebar sekarang ada di satu blok */
 .sidebar {
-     position: fixed;
-     top: 0;
-     left: 0;
-     height: 100vh;
-     width: 300px;
-     background-color: #f8ffe5;
-     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-     z-index: 1031;
-     padding-top: 0px;
-     transition: transform 0.3s ease-in-out;
-     transform: translateX(0);
-     overflow-y: auto; /* Ini tetap diperlukan agar fungsionalitas scroll bekerja */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;
+    background-color: #f8ffe5;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1031;
+    padding-top: 0px;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(0);
+    overflow-y: auto; /* Ini tetap diperlukan agar fungsionalitas scroll bekerja */
 }
 
 .sidebar .nav-link,
 .sidebar .nav-item button {
-     color: black !important; /* Warna teks hitam, !important diperlukan untuk menimpa Bootstrap */
-     transition: background-color 0.2s ease;
-     padding: 8px 12px;
-     margin: 2px 10px;
-     border-radius: 8px;
+    color: black !important; /* Warna teks hitam, !important diperlukan untuk menimpa Bootstrap */
+    transition: background-color 0.2s ease;
+    padding: 8px 12px;
+    margin: 2px 10px;
+    border-radius: 8px;
 }
 
 /*Aturan hover untuk link dan button digabung agar efisien */
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active,
 .sidebar .nav-item button:hover {
-     background-color: rgb(117, 208, 112);
-     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: rgb(117, 208, 112);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar .nav-item button {
-     width: calc(100% - 20px);
-     background: none;
-     border: none;
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
+    width: calc(100% - 20px);
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .sidebar .collapse {
-     overflow: hidden;
-     transition: height 0.3s ease-in-out;
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
 }
 
 /* ===========================
     HEADER STYLING
     =========================== */
 .app-header {
-     background-color: rgb(117, 208, 112);
-     color: #ffffff;
-     height: 60px;
-     position: fixed;
-     top: 0;
-     left: 300px;
-     width: calc(100% - 300px);
-     z-index: 1029;
-     display: flex;
-     align-items: center;
-     padding-left: 1rem;
-     transition: left 0.3s ease, width 0.3s ease;
+    background-color: rgb(117, 208, 112);
+    color: #ffffff;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 300px;
+    width: calc(100% - 300px);
+    z-index: 1029;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    transition: left 0.3s ease, width 0.3s ease;
 }
 
 .card-header-custom {
     background-color: #eeeeee; /* Contoh: Warna Biru Langit Sangat Pucat */
-    color: #555 ; /* Contoh: Warna Teks Biru Gelap */
+    color: #555; /* Contoh: Warna Teks Biru Gelap */
 }
 
 .list-group-item-header {
@@ -117,27 +119,27 @@ body {
     LAYOUT & RESPONSIVE
     =========================== */
 .overlay {
-     position: fixed;
-     top: 0;
-     left: 0;
-     right: 0;
-     bottom: 0;
-     background: rgba(0, 0, 0, 0.3);
-     z-index: 1030;
-     display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1030;
+    display: none;
 }
 
 .overlay.show {
-     display: block;
+    display: block;
 }
 
 .rotate-icon {
-     transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 /*Selector ini lebih spesifik untuk memastikan ikon berputar */
 .sidebar .nav-item button[aria-expanded="true"] .rotate-icon {
-     transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 /* Style khusus untuk judul pemisah di sidebar */
@@ -146,53 +148,65 @@ body {
     font-size: 0.8rem;
     font-weight: bold;
     text-transform: uppercase;
-    
+
     /* PERUBAHAN DI SINI */
     /* Atur margin atas untuk jarak dari menu sebelumnya */
-    margin: 0.2rem 10px 0 10px; 
+    margin: 0.2rem 10px 0 10px;
 
     /* Garis pemisah di atas */
     border-top: 1px solid #eee;
-    
+
     /* Padding atas juga dikecilkan agar teks lebih dekat ke garis */
     padding: 0.5rem 12px 0.25rem 12px;
 }
 
-
-
 /* Aturan untuk layar kecil (mobile) */
 @media (max-width: 768px) {
-     .sidebar {
-          transform: translateX(-100%);
-     }
+    html,
+    body {
+        font-size: 13px; /* Atur ukuran font dasar lebih kecil di mobile */
+    }
 
-     .sidebar.show {
-          transform: translateX(0);
-     }
+    .sidebar {
+        transform: translateX(-100%);
+    }
 
-     .app-header,
-     body.sidebar-hidden .app-header {
-          left: 0;
-          width: 100%;
-     }
+    .sidebar.show {
+        transform: translateX(0);
+    }
 
-     body,
-     body.sidebar-hidden {
-          padding-left: 0;
-     }
+    .app-header,
+    body.sidebar-hidden .app-header {
+        left: 0;
+        width: 100%;
+    }
 
-     /* Kita targetkan tombol tab di dalam #pengirimanTab agar spesifik */
-     #pengirimanTab .nav-link {
-     font-size: 0.85rem;      /* Kecilkan ukuran font sedikit */
-     padding: 0.6rem 0.75rem; /* Kurangi padding atas/bawah dan kanan/kiri */
-     }
+    body,
+    body.sidebar-hidden {
+        padding-left: 0;
+    }
 
-     /* Kecilkan juga badge angka di dalamnya */
-     #pengirimanTab .nav-link .badge {
-     font-size: 0.7rem;        /* Kecilkan ukuran font badge */
-     padding: 0.25em 0.5em;    /* Sesuaikan padding badge */
-     }
+    #pengirimanTab .nav-link {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.75rem;
+    }
 
+    #pengirimanTab .nav-link .badge {
+        font-size: 0.7rem;
+        padding: 0.25em 0.5em;
+    }
+
+    /* Tambahan: perkecil font sidebar dan konten */
+    .sidebar,
+    .sidebar .nav-link,
+    .sidebar .nav-item button,
+    .sidebar-heading,
+    .container,
+    .card,
+    .card-header,
+    .card-body {
+        font-size: 0.92em;
+    }
 }
 
 /* ===========================
@@ -205,23 +219,23 @@ a.card-link:hover {
 }
 
 /* Hilangkan spinner di input type number */
-input[type=number].no-spinner::-webkit-outer-spin-button,
-input[type=number].no-spinner::-webkit-inner-spin-button {
-     -webkit-appearance: none;
-     margin: 0;
-}
-
-input[type=number].no-spinner {
-     appearance: textfield; /* Firefox */
-}
-
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
+input[type="number"].no-spinner::-webkit-outer-spin-button,
+input[type="number"].no-spinner::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-input[type=number] {
+input[type="number"].no-spinner {
+    appearance: textfield; /* Firefox */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
     appearance: textfield; /* Firefox */
 }
 
